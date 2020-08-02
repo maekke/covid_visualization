@@ -30,7 +30,28 @@ function processData(rows) {
 	console.log('dates',dates);
 	console.log('covid codes',covid_codes);
 	makePlotly(dates, covid_codes);
-	getTotalCases(dates);
+	getOpenZhCovid19Data('ncumul_conf', function(total_dates, total_data, total_data_sum, total_data_inc) {
+		daily_cases = [];
+
+		for (let i = 0; i < dates.length; ++i) {
+			let d_index = total_dates.indexOf(dates[i]);
+			if (d_index >= 0) {
+				daily_cases.push(total_cases_inc[d_index]);
+			}
+		}
+		console.log(daily_cases)
+
+		var plotDiv = document.getElementById("plot");
+		console.log(plotDiv)
+		var trace = {
+			x: dates,
+			y: daily_cases,
+			name: 'Confirmed COVID-19 cases',
+			type: 'bar',
+		};
+
+		Plotly.addTraces(plotDiv, trace);
+	});
 }
 
 function makePlotly(dates, covid_codes){

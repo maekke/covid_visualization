@@ -1,4 +1,4 @@
-function getTotalCases(dates) {
+function getOpenZhCovid19Data(data_column, callback) {
  	Plotly.d3.csv("https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv",
 		function(rows){
 			total_cases = [];
@@ -46,9 +46,8 @@ function getTotalCases(dates) {
 				}
 				let canton = row['abbreviation_canton_and_fl'];
 				let c_index = cantons.indexOf(canton);
-				let numcul_confirmed = row['ncumul_conf'];
+				let numcul_confirmed = row[data_column];
 				if (numcul_confirmed !== "") {
-					//total_cases[date_index] += parseInt(row['ncumul_conf']);
 					total_cases[d_index][c_index] = parseInt(numcul_confirmed);
 				}
 				else if (numcul_confirmed === "" && d_index > 0) {
@@ -85,29 +84,8 @@ function getTotalCases(dates) {
 			}
 			console.log(total_cases_inc);
 
-			daily_cases = [];
-
-			for (let i = 0; i < dates.length; ++i) {
-				let d_index = total_dates.indexOf(dates[i]);
-				if (d_index >= 0) {
-					daily_cases.push(total_cases_inc[d_index]);
-				}
-			}
-			console.log(daily_cases)
-
-			var plotDiv = document.getElementById("plot");
-			console.log(plotDiv)
-			var trace = {
-				x: dates,
-				y: daily_cases,
-				name: 'confirmed COVID-19 cases',
-				type: 'bar',
-			};
-
-			Plotly.addTraces(plotDiv, trace);
-
+			callback(total_dates, total_cases, total_cases_sum, total_cases_inc);
 		}
 	);
 }
-
 
