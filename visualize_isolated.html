@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+</head>
+<body>
+<div id="isolated" style="width:100%; height:600px;"></div>
+
+<script>
+
+function makeplot() {
+ 	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/bag_data.csv",
+		function(data){
+			processData(data)
+		}
+	);
+};
+	
+function processData(rows) {
+
+	console.log(rows);
+	var dates = [];
+	var isolated = [];
+	var quarantined = [];
+	var quarantined_travel = [];
+
+	for (var i=0; i<rows.length; i++) {
+		row = rows[i];
+		if (row['isolated'] > 0) {
+			dates.push(row['date']);
+			isolated.push(row['isolated']);
+			quarantined.push(row['quarantined']);
+			quarantined_travel.push(row['quarantined_travel']);
+		}
+	}
+	console.log('dates',dates);
+	makePlotly(dates, isolated, quarantined, quarantined_travel);
+}
+
+function makePlotly(dates, isolated, quarantined, quarantined_travel){
+	var traces = [{
+		x: dates,
+		y: isolated,
+		name: 'Isolated'
+	},
+	{
+		x: dates,
+		y: quarantined,
+		name: 'Quarantined'
+	},
+	{
+		x: dates,
+		y: quarantined_travel,
+		name: 'Quarantined travel'
+	},
+	];
+
+	Plotly.newPlot('isolated', traces, 
+		{title: 'BAG COVID-19 isolation / quarantined cases'});
+};
+
+makeplot();
+
+</script>
+
+</body>
+</html>
