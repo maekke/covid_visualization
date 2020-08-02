@@ -39,6 +39,7 @@ function processData(rows) {
 	for (let i = 1; i < total_pcr_tests.length; ++i) {
 		total_pcr_tests_inc.push(total_pcr_tests[i] - total_pcr_tests[i - 1])
 	}
+	total_pcr_tests_inc[0] = total_pcr_tests_inc[1];
 	console.log(total_pcr_tests_inc);
 
 	const window_size = 7;
