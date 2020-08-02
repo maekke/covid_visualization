@@ -5,3 +5,6 @@
 
 ## Isolated and quarantined numbers from BAG
 [Isolated and quarantined numbers from BAG](https://maekke.github.io/visualize_isolated.html)
+
+## Performed PCR tests
+[Performed PCR tests from BAG](https://maekke.github.io/visualize_tests.html)

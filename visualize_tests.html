@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+</head>
+<body>
+<div id="isolated" style="width:100%; height:600px;"></div>
+
+<script>
+
+function makeplot() {
+ 	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/bag_data.csv",
+		function(data){
+			processData(data)
+		}
+	);
+};
+	
+function processData(rows) {
+	console.log(rows);
+	var dates = [];
+	var total_pcr_tests = [];
+	var positivity_rate = [];
+
+	for (let i = 0; i < rows.length; ++i) {
+		row = rows[i];
+		if (row['total_number_of_tests'] > 0) {
+			dates.push(row['date']);
+			total_pcr_tests.push(row['total_number_of_tests']);
+			positivity_rate.push(row['positivity_rate_percent']);
+		}
+	}
+	console.log('dates',dates);
+	console.log(positivity_rate);
+
+	var total_pcr_tests_inc = [];
+	total_pcr_tests_inc.push(0);
+	for (let i = 1; i < total_pcr_tests.length; ++i) {
+		total_pcr_tests_inc.push(total_pcr_tests[i] - total_pcr_tests[i - 1])
+	}
+	console.log(total_pcr_tests_inc);
+
+	const window_size = 7;
+	var total_pcr_tests_inc_avg = [];
+	for (let i = window_size; i < total_pcr_tests_inc.length; ++i) {
+		let avg = 0;
+		for (let j = 0; j < window_size; ++j) {
+			avg += total_pcr_tests_inc[i - j];
+		}
+		total_pcr_tests_inc_avg.push(avg / window_size);
+	}
+	for (let j = 0; j < window_size; ++j) {
+		total_pcr_tests_inc_avg.push(total_pcr_tests_inc_avg[total_pcr_tests_inc_avg.length - 1]);
+	}
+	console.log(total_pcr_tests_inc_avg);
+
+	var traces = [{
+		x: dates,
+		y: total_pcr_tests_inc,
+		name: 'PCR tests',
+	},
+	{
+		x: dates,
+		y: total_pcr_tests_inc_avg,
+		name: 'PCR tests average',
+		line: {
+			dash: 'dash',
+		},
+	},
+	{
+		x: dates,
+		y: positivity_rate,
+		name: 'Positivity rate',
+		yaxis: 'y2',
+	},
+	];
+
+
+	makePlotly(traces);
+}
+
+function makePlotly(traces){
+	var layout = {
+		title: 'Performed PCR tests',
+		yaxis2: {
+			title: 'Positivity rate %',
+			overlaying: 'y',
+			side: 'right'
+		},
+	};
+
+	Plotly.newPlot('isolated', traces, layout);
+};
+
+makeplot();
+
+</script>
+
+</body>
+</html>
