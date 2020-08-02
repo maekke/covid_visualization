@@ -43,15 +43,21 @@ function processData(rows) {
 	console.log(total_pcr_tests_inc);
 
 	const window_size = 7;
+	const w_size = 3;
 	var total_pcr_tests_inc_avg = [];
-	for (let i = window_size; i < total_pcr_tests_inc.length; ++i) {
+	for (let i = w_size; i < total_pcr_tests_inc.length - w_size; ++i) {
 		let avg = 0;
-		for (let j = 0; j < window_size; ++j) {
+		for (let j = -w_size; j <= w_size; ++j) {
 			avg += total_pcr_tests_inc[i - j];
 		}
 		total_pcr_tests_inc_avg.push(avg / window_size);
+		if (i === w_size) {
+			for (let j = 0; j < w_size; ++j) {
+				total_pcr_tests_inc_avg.push(total_pcr_tests_inc_avg[0])
+			}
+		}
 	}
-	for (let j = 0; j < window_size; ++j) {
+	for (let j = 0; j < w_size; ++j) {
 		total_pcr_tests_inc_avg.push(total_pcr_tests_inc_avg[total_pcr_tests_inc_avg.length - 1]);
 	}
 	console.log(total_pcr_tests_inc_avg);
