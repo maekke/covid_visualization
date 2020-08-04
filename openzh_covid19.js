@@ -114,3 +114,18 @@ function diffData(data) {
 	data_inc[0] = data_inc[1] ;
 	return data_inc;
 }
+
+function selectCantonalData(data, canton) {
+	const cantons = getCantons();
+	const c_index = cantons.indexOf(canton);
+	if (c_index >= 0) {
+		const n = data.length;
+		let c_data = []
+		c_data.length = n;
+		for (let i = 0; i < n; ++i) {
+			c_data[i] = data[i][c_index];
+		}
+		return c_data;
+	}
+	console.error('canton not found!');
+}

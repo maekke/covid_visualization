@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot" style="width:100%; height:600px;"></div>
+
+<script>
+
+const canton = "ZH";
+
+function makeplot() {
+	makePlotly();
+	getOpenZhCovid19Data(['ncumul_conf', 'ncumul_deceased', 'current_hosp'], function(total_dates, total_data, data_column) {
+		let trace = null;
+		if (data_column === 'ncumul_conf') {
+			let cantonal_data = selectCantonalData(total_data, canton);
+			let cantonal_data_inc = diffData(cantonal_data);
+			trace = {
+				x: total_dates,
+				y: cantonal_data_inc,
+				name: 'Confirmed cases for ' + canton,
+				type: 'bar',
+			};
+		}
+		else if (data_column === 'ncumul_deceased') {
+			let cantonal_data = selectCantonalData(total_data, canton);
+			let cantonal_data_inc = diffData(cantonal_data);
+			trace = {
+				x: total_dates,
+				y: cantonal_data_inc,
+				name: 'Deceased cases for ' + canton,
+				type: 'bar',
+			};
+		}
+		else if (data_column === 'current_hosp') {
+			let cantonal_data = selectCantonalData(total_data, canton);
+			trace = {
+				x: total_dates,
+				y: cantonal_data,
+				name: 'Hospitalized cases for ' + canton,
+				type: 'bar',
+			};
+		}
+
+		if (trace) {
+			var plotDiv = document.getElementById("plot");
+			Plotly.addTraces(plotDiv, trace);
+		}
+	});
+}
+	
+function makePlotly(){
+	var traces = [];
+
+	var layout = {
+		title: 'Cantonal data ' + canton,
+	};
+
+	Plotly.newPlot('plot', traces, layout);
+}
+
+makeplot();
+
+</script>
+
+</body>
+</html>
