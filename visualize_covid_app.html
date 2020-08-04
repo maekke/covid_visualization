@@ -27,14 +27,10 @@ function processData(rows) {
 		dates.push(row['date']);
 		covid_codes.push(row['entered_codes_total']);
 	}
-	console.log('dates',dates);
-	console.log('covid codes',covid_codes);
 	makePlotly(dates, covid_codes);
 	getOpenZhCovid19Data('ncumul_conf', function(total_dates, total_data) {
 		total_cases_sum = sumCantonalData(total_data);
-		console.log(total_cases_sum);
 		total_cases_inc = diffData(total_cases_sum);
-		console.log(total_cases_inc);
 
 		daily_cases = [];
 
@@ -44,10 +40,8 @@ function processData(rows) {
 				daily_cases.push(total_cases_inc[d_index]);
 			}
 		}
-		console.log(daily_cases)
 
 		var plotDiv = document.getElementById("plot");
-		console.log(plotDiv)
 		var trace = {
 			x: dates,
 			y: daily_cases,
@@ -70,7 +64,6 @@ function makePlotly(dates, covid_codes){
 
 	var layout = {
 		title: 'BAG COVID-19 SwissCovid entered covid codes',
-		// barmode: 'stack',
 	};
 
 	Plotly.newPlot('plot', traces, layout);
