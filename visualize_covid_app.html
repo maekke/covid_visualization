@@ -30,7 +30,12 @@ function processData(rows) {
 	console.log('dates',dates);
 	console.log('covid codes',covid_codes);
 	makePlotly(dates, covid_codes);
-	getOpenZhCovid19Data('ncumul_conf', function(total_dates, total_data, total_data_sum, total_data_inc) {
+	getOpenZhCovid19Data('ncumul_conf', function(total_dates, total_data) {
+		total_cases_sum = sumCantonalData(total_data);
+		console.log(total_cases_sum);
+		total_cases_inc = diffData(total_cases_sum);
+		console.log(total_cases_inc);
+
 		daily_cases = [];
 
 		for (let i = 0; i < dates.length; ++i) {
