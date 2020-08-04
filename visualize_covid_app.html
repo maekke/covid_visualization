@@ -28,7 +28,7 @@ function processData(rows) {
 		covid_codes.push(row['entered_codes_total']);
 	}
 	makePlotly(dates, covid_codes);
-	getOpenZhCovid19Data('ncumul_conf', function(total_dates, total_data) {
+	getOpenZhCovid19Data(['ncumul_conf'], function(total_dates, total_data, data_column) {
 		total_cases_sum = sumCantonalData(total_data);
 		total_cases_inc = diffData(total_cases_sum);
 
