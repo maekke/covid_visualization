@@ -3,6 +3,7 @@
 <html>
 <head>
 <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+<script src="openzh_covid19.js"></script>
 </head>
 <body>
 <div id="isolated" style="width:100%; height:600px;"></div>
@@ -42,24 +43,7 @@ function processData(rows) {
 	total_pcr_tests_inc[0] = total_pcr_tests_inc[1];
 	console.log(total_pcr_tests_inc);
 
-	const window_size = 7;
-	const w_size = 3;
-	var total_pcr_tests_inc_avg = [];
-	for (let i = w_size; i < total_pcr_tests_inc.length - w_size; ++i) {
-		let avg = 0;
-		for (let j = -w_size; j <= w_size; ++j) {
-			avg += total_pcr_tests_inc[i - j];
-		}
-		total_pcr_tests_inc_avg.push(avg / window_size);
-		if (i === w_size) {
-			for (let j = 0; j < w_size; ++j) {
-				total_pcr_tests_inc_avg.push(total_pcr_tests_inc_avg[0])
-			}
-		}
-	}
-	for (let j = 0; j < w_size; ++j) {
-		total_pcr_tests_inc_avg.push(total_pcr_tests_inc_avg[total_pcr_tests_inc_avg.length - 1]);
-	}
+	var total_pcr_tests_inc_avg = average(total_pcr_tests_inc, 7);
 	console.log(total_pcr_tests_inc_avg);
 
 	var traces = [{
