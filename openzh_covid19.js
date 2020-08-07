@@ -129,3 +129,25 @@ function selectCantonalData(data, canton) {
 	}
 	console.error('canton not found!');
 }
+
+function average(data, window_size) {
+	const n = data.length;
+	const w2 = Math.floor(window_size / 2);
+	console.log(w2);
+	data_avg = [];
+	data_avg.length = n;
+	for (let i = w2; i < n - w2; ++i) {
+		data_avg[i] = 0;
+		for (let j = -w2; j <= w2; ++j) {
+			data_avg[i] += data[i + j];
+		}
+		data_avg[i] /= window_size;
+	}
+	for (let i = 0; i < w2; ++i) {
+		data_avg[i] = data_avg[w2];
+	}
+	for (let i = n - w2; i < n; ++i) {
+		data_avg[i] = data_avg[n - w2 - 1];
+	}
+	return data_avg;
+}

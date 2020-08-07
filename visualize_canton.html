@@ -12,43 +12,90 @@
 
 const canton = "ZH";
 
+function addTrace(trace) {
+	var plotDiv = document.getElementById("plot");
+	Plotly.addTraces(plotDiv, trace);
+}
+
 function makeplot() {
 	makePlotly();
-	getOpenZhCovid19Data(['ncumul_conf', 'ncumul_deceased', 'current_hosp'], function(total_dates, total_data, data_column) {
-		let trace = null;
+	getOpenZhCovid19Data(['ncumul_conf', 'ncumul_deceased', 'current_hosp', 'current_isolated', 'current_quarantined'], function(total_dates, total_data, data_column) {
 		if (data_column === 'ncumul_conf') {
 			let cantonal_data = selectCantonalData(total_data, canton);
 			let cantonal_data_inc = diffData(cantonal_data);
-			trace = {
+			let trace = {
 				x: total_dates,
 				y: cantonal_data_inc,
 				name: 'Confirmed cases for ' + canton,
-				type: 'bar',
+				type: 'scatter',
+				mode: 'markers',
 			};
+			addTrace(trace);
+			let cantonal_data_avg = average(cantonal_data_inc, 7);
+			trace = {
+				x: total_dates,
+				y: cantonal_data_avg,
+				name: 'Confirmed cases averaged for ' + canton,
+				type: 'scatter',
+				mode: 'lines',
+				line: {
+					width: 1,
+				},
+			};
+			addTrace(trace);
 		}
 		else if (data_column === 'ncumul_deceased') {
 			let cantonal_data = selectCantonalData(total_data, canton);
 			let cantonal_data_inc = diffData(cantonal_data);
-			trace = {
+			let trace = {
 				x: total_dates,
 				y: cantonal_data_inc,
 				name: 'Deceased cases for ' + canton,
-				type: 'bar',
+				type: 'scatter',
+				mode: 'markers',
 			};
+			addTrace(trace);
 		}
 		else if (data_column === 'current_hosp') {
 			let cantonal_data = selectCantonalData(total_data, canton);
-			trace = {
+			let trace = {
 				x: total_dates,
 				y: cantonal_data,
 				name: 'Hospitalized cases for ' + canton,
-				type: 'bar',
+				type: 'scatter',
+				mode: 'lines',
 			};
+			addTrace(trace);
 		}
-
-		if (trace) {
-			var plotDiv = document.getElementById("plot");
-			Plotly.addTraces(plotDiv, trace);
+		else if (data_column === 'current_isolated') {
+			let cantonal_data = selectCantonalData(total_data, canton);
+			let trace = {
+				x: total_dates,
+				y: cantonal_data,
+				name: 'Isolated for ' + canton,
+				type: 'scatter',
+				mode: 'lines',
+				line: {
+					dash: 'dot',
+				},
+				visible: "legendonly",
+			};
+			addTrace(trace);
+		}
+		else if (data_column === 'current_quarantined') {
+			let cantonal_data = selectCantonalData(total_data, canton);
+			let trace = {
+				x: total_dates,
+				y: cantonal_data,
+				name: 'Quarantined for ' + canton,
+				type: 'scatter',
+				mode: 'lines',
+				line: {
+					dash: 'dot',
+				},
+				visible: "legendonly",
+			};
+			addTrace(trace);
 		}
 	});
 }
@@ -56,9 +103,51 @@ function makeplot() {
 function makePlotly(){
 	var traces = [];
 
+	var selectorOptions = {
+		buttons: [
+		{
+			step: 'week',
+			stepmode: 'backward',
+			count: 1,
+			label: '1w'
+		},
+		{
+			step: 'week',
+			stepmode: 'backward',
+			count: 2,
+			label: '2w'
+		},
+		/*
+		{
+			step: 'month',
+			stepmode: 'backward',
+			count: 1,
+			label: '1m'
+		},
+		{
+			step: 'month',
+			stepmode: 'backward',
+			count: 2,
+			label: '2m'
+		},
+		*/
+		{
+			step: 'all',
+		}],
+		visible: true,
+	};
+
 	var layout = {
 		title: 'Cantonal data ' + canton,
+		xaxis: {
+			rangeselector: selectorOptions,
+			rangeslider: {}
+		},
+		yaxis: {
+			fixedrange: true
+		}
 	};
+	console.log(layout);
 
 	Plotly.newPlot('plot', traces, layout);
 }
