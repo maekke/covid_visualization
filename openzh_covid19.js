@@ -133,7 +133,6 @@ function selectCantonalData(data, canton) {
 function average(data, window_size) {
 	const n = data.length;
 	const w2 = Math.floor(window_size / 2);
-	console.log(w2);
 	data_avg = [];
 	data_avg.length = n;
 	for (let i = w2; i < n - w2; ++i) {
