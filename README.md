@@ -8,3 +8,6 @@
 
 ## Performed PCR tests
 [Performed PCR tests from BAG](https://maekke.github.io/visualize_tests.html)
+
+## Canton ZH data
+[Canton Zurich covid data](https://maekke.github.io/visualize_canton.html)
