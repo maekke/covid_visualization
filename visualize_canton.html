@@ -7,19 +7,20 @@
 </head>
 <body>
 <div id="plot" style="width:100%; height:600px;"></div>
+<select id="canton-selector" />
 
 <script>
 
-const canton = "ZH";
+var canton = "ZH";
+const dataColumns = ['ncumul_conf', 'ncumul_deceased', 'current_hosp', 'current_isolated', 'current_quarantined'];
 
 function addTrace(trace) {
-	var plotDiv = document.getElementById("plot");
+	let plotDiv = document.getElementById("plot");
 	Plotly.addTraces(plotDiv, trace);
 }
 
 function makeplot() {
-	makePlotly();
-	getOpenZhCovid19Data(['ncumul_conf', 'ncumul_deceased', 'current_hosp', 'current_isolated', 'current_quarantined'], function(total_dates, total_data, data_column) {
+	getOpenZhCovid19Data(dataColumns, function(total_dates, total_data, data_column) {
 		if (data_column === 'ncumul_conf') {
 			let cantonal_data = selectCantonalData(total_data, canton);
 			let cantonal_data_inc = diffData(cantonal_data);
@@ -101,8 +102,25 @@ function makeplot() {
 }
 	
 function makePlotly(){
-	var traces = [];
+	let cantons = getCantons();
+	var cantonSelector = document.getElementById("canton-selector");
+	for (let i = 0; i < cantons.length; ++i) {
+		var option = document.createElement('option');
+		option.text = cantons[i];
+		cantonSelector.appendChild(option);
+	}
+	cantonSelector.value = canton;
 
+	cantonSelector.addEventListener('change', function() {
+		let plotDiv = document.getElementById("plot");
+		for (let i = 0; i < dataColumns.length + 1; ++i) {
+			Plotly.deleteTraces(plotDiv, 0);
+		}
+		canton = cantonSelector.value;
+		makeplot();
+	}, false);
+
+	var traces = [];
 	var selectorOptions = {
 		buttons: [
 		{
@@ -135,7 +153,7 @@ function makePlotly(){
 	};
 
 	var layout = {
-		title: 'Cantonal data ' + canton,
+		title: 'Cantonal data',
 		xaxis: {
 			rangeselector: selectorOptions,
 			rangeslider: {
@@ -144,12 +162,13 @@ function makePlotly(){
 		},
 		yaxis: {
 			fixedrange: false,
-		}
+		},
 	};
 
 	Plotly.newPlot('plot', traces, layout);
 }
 
+makePlotly();
 makeplot();
 
 </script>
