@@ -9,5 +9,8 @@
 ## Performed PCR tests
 [Performed PCR tests from BAG](https://maekke.github.io/visualize_tests.html)
 
+## Weekly performed PCR tests per canton
+[Weekly performed PCR tests per canton from BAG](https://maekke.github.io/visualize_tests_per_canton.html)
+
 ## Canton ZH data
 [Canton Zurich covid data](https://maekke.github.io/visualize_canton.html)
