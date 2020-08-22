@@ -11,7 +11,6 @@
 
 [Weekly performed PCR tests from BAG](https://maekke.github.io/visualize_weekly_tests.html)
 
-## Weekly performed PCR tests per canton
 [Weekly performed PCR tests per canton from BAG](https://maekke.github.io/visualize_tests_per_canton.html)
 
 ## Cantonal data
