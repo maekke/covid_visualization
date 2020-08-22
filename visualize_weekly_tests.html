@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="isolated" style="width:100%; height:600px;"></div>
+
+<script>
+
+function makeplot() {
+ 	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/bag_weekly_data.csv",
+		function(data){
+			processData(data)
+		}
+	);
+};
+	
+function processData(rows) {
+	var weeks = [];
+	var total_pcr_tests = [];
+	var positivity_rate = [];
+
+	for (let i = 0; i < rows.length; ++i) {
+		row = rows[i];
+		weeks.push(row['week']);
+		total_pcr_tests.push(row['total_number_of_tests']);
+		positivity_rate.push(row['positivity_rate_percent']);
+	}
+
+	var traces = [{
+		x: weeks,
+		y: total_pcr_tests,
+		name: 'weekly PCR tests',
+	},
+	{
+		x: weeks,
+		y: positivity_rate,
+		name: 'Positivity rate',
+		yaxis: 'y2',
+	},
+	];
+
+
+	makePlotly(traces);
+}
+
+function makePlotly(traces){
+	var layout = {
+		title: 'Weekly performed PCR tests',
+		yaxis2: {
+			title: 'Positivity rate %',
+			overlaying: 'y',
+			side: 'right',
+			showgrid: false,
+		},
+	};
+
+	Plotly.newPlot('isolated', traces, layout);
+};
+
+makeplot();
+
+</script>
+
+</body>
+</html>

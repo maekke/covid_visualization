@@ -7,7 +7,8 @@
 [Isolated and quarantined numbers from BAG](https://maekke.github.io/visualize_isolated.html)
 
 ## Performed PCR tests
-[Performed PCR tests from BAG](https://maekke.github.io/visualize_tests.html)
+[Daily performed PCR tests from BAG](https://maekke.github.io/visualize_tests.html)
+[Weekly performed PCR tests from BAG](https://maekke.github.io/visualize_weekly_tests.html)
 
 ## Weekly performed PCR tests per canton
 [Weekly performed PCR tests per canton from BAG](https://maekke.github.io/visualize_tests_per_canton.html)
