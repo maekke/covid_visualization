@@ -12,5 +12,9 @@
 ## Weekly performed PCR tests per canton
 [Weekly performed PCR tests per canton from BAG](https://maekke.github.io/visualize_tests_per_canton.html)
 
-## Canton ZH data
-[Canton Zurich covid data](https://maekke.github.io/visualize_canton.html)
+## Cantonal data
+[Cantonal covid data](https://maekke.github.io/visualize_canton.html)
+
+## Infection source data
+[Infection source data](https://maekke.github.io/visualize_infection_sources.html)
+

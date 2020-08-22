@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot_ag" style="width:100%; height:600px;"></div>
+<div id="plot_zg" style="width:100%; height:600px;"></div>
+<div id="plot_zh" style="width:100%; height:600px;"></div>
+
+<script>
+
+const dataColumns = ['ncumul_conf', 'ncumul_deceased', 'current_hosp', 'current_isolated', 'current_quarantined'];
+
+function addTrace(trace, canton) {
+	let plotDiv = document.getElementById('plot_' + canton);
+	Plotly.addTraces(plotDiv, trace);
+}
+
+function makeplot(canton) {
+ 	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/infection_source/master/infection_source_" + canton + ".csv",
+		function(data){
+			processData(data, canton)
+		}
+	);
+}
+
+function processData(rows, canton) {
+	let dates = [];
+	let data = [];
+	let sources = [];
+
+	for (let i = 0; i < rows.length; ++i) {
+		let row = rows[i];
+		let date_index = -1;
+		if (row['date'] !== '') {
+			date_index = dates.indexOf(row['date'])
+			if (date_index == -1) {
+				date_index = dates.push(row['date']) - 1;
+			}
+		}
+		else if (row['date_from'] !== '') {
+			date_index = dates.indexOf(row['date_from'])
+			if (date_index === -1) {
+				date_index = dates.push(row['date_from']) - 1;
+			}
+		}
+
+		if (date_index >= 0) {
+			let source_index = sources.indexOf(row['source'])
+			if (source_index === -1) {
+				source_index = sources.push(row['source']) - 1;
+			}
+			if (data.length < date_index + 1) {
+				data.push([]);
+			}
+			if (data[date_index].length < sources.length) {
+				data[date_index].length = sources.length;
+			}
+			data[date_index][source_index] = row['count'];
+		}
+	}
+
+	var traces = [];
+	for (let i = 0; i < sources.length; ++i) {
+		let y_data = [];
+		y_data.size = dates.length;
+		for (let j = 0; j < dates.length; ++j) {
+			y_data[j] = data[j][i];
+		}
+		traces.push({
+			x: dates,
+			y: y_data,
+			name: sources[i],
+			type: 'bar',
+		});
+
+	}
+
+	addTrace(traces, canton);
+}
+
+function makePlotly(canton) {
+	var traces = [];
+
+	var layout = {
+		title: 'Infection sources for ' + canton,
+		barmode: 'stack',
+	};
+
+	Plotly.newPlot('plot_' + canton, traces, layout);
+}
+
+let cantons = ['ag', 'zg', 'zh'];
+for (let i = 0; i < cantons.length; ++i) {
+	let canton = cantons[i];
+	makePlotly(canton);
+	makeplot(canton);
+}
+
+</script>
+
+</body>
+</html>
