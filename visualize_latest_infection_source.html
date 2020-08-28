@@ -13,8 +13,6 @@
 
 <script>
 
-const dataColumns = ['ncumul_conf', 'ncumul_deceased', 'current_hosp', 'current_isolated', 'current_quarantined'];
-
 function addTrace(trace, canton) {
 	let plotDiv = document.getElementById('plot_' + canton);
 	Plotly.addTraces(plotDiv, trace);
