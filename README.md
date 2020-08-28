@@ -19,4 +19,4 @@
 ## Infection source data
 [Infection source data over time](https://maekke.github.io/visualize_infection_sources.html)
 
-[Latest infection source data](https://maekke.github.io/visualize_latest_infection_sources.html)
+[Latest infection source data](https://maekke.github.io/visualize_latest_infection_source.html)
