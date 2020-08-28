@@ -13,8 +13,10 @@
 
 <script>
 
-function addTrace(trace, canton) {
+function addTrace(trace, canton, title) {
 	let plotDiv = document.getElementById('plot_' + canton);
+	console.log(title);
+	Plotly.relayout(plotDiv, { title: title, });
 	Plotly.addTraces(plotDiv, trace);
 }
 
@@ -30,6 +32,7 @@ function processData(rows, canton) {
 	let dates = [];
 	let data = [];
 	let sources = [];
+	let date_desc = '';
 
 	for (let i = 0; i < rows.length; ++i) {
 		let row = rows[i];
@@ -38,12 +41,14 @@ function processData(rows, canton) {
 			date_index = dates.indexOf(row['date'])
 			if (date_index == -1) {
 				date_index = dates.push(row['date']) - 1;
+				date_desc = row['date']
 			}
 		}
 		else if (row['date_from'] !== '') {
 			date_index = dates.indexOf(row['date_from'])
 			if (date_index === -1) {
 				date_index = dates.push(row['date_from']) - 1;
+				date_desc = row['date_from'] + ' - ' + row['date_to']
 			}
 		}
 
@@ -75,7 +80,7 @@ function processData(rows, canton) {
 	});
 
 
-	addTrace(traces, canton);
+	addTrace(traces, canton, 'Infection sources for ' + canton + ' (' + date_desc + ')');
 }
 
 function makePlotly(canton) {
