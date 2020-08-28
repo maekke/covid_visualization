@@ -17,5 +17,6 @@
 [Cantonal covid data](https://maekke.github.io/visualize_canton.html)
 
 ## Infection source data
-[Infection source data](https://maekke.github.io/visualize_infection_sources.html)
+[Infection source data over time](https://maekke.github.io/visualize_infection_sources.html)
 
+[Latest infection source data](https://maekke.github.io/visualize_latest_infection_sources.html)
