@@ -6,6 +6,7 @@
 </head>
 <body>
 <div id="overview" style="width:100%; height:800px;"></div>
+<div id="reduced" style="width:100%; height:800px;"></div>
 
 <script>
 
@@ -74,7 +75,7 @@ function processData(rows) {
 	conf_cases_diff = [];
 	conf_cases_diff.size = conf_cases.size;
 	for (let canton = 0; canton < cantons.length; ++canton) {
-		conf_cases_diff[canton] = [];
+		conf_cases_diff[canton] = [0];
 		conf_cases_diff[canton].size = conf_cases[canton].size;
 		for (let i = 1; i < dates.length; ++i) {
 			conf_cases_diff[canton][i] = conf_cases[canton][i] - conf_cases[canton][i - 1]
@@ -111,8 +112,31 @@ function processData(rows) {
 		FL: 38114,
 	};
 
-	// average it weekly
-	const avg_days = 7;
+	// keep a clone of the data for a subset
+	let dates_from_june = dates.slice();
+	let conf_cases_diff_from_june = JSON.parse(JSON.stringify(conf_cases_diff));
+
+	// average the full set and plot it
+	average(dates, cantons, conf_cases_diff, 7, inhabitants);
+	updatePlot(dates, cantons, conf_cases_diff, 'overview');
+
+	// create a second plot from beginning of june
+	let index = dates_from_june.indexOf('2020-06-01')
+	if (index === -1) {
+		console.log('could not find 2020-06-01 entry!')
+		return;
+	}
+	// and remove everything before 2020-06-01.
+	for (let canton = 0; canton < cantons.length; ++canton) {
+		conf_cases_diff_from_june[canton].splice(0, index);
+	}
+	dates_from_june.splice(0, index);
+	// and average / output it.
+	average(dates_from_june, cantons, conf_cases_diff_from_june, 7, inhabitants);
+	updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, 'reduced');
+}
+
+function average(dates, cantons, conf_cases_diff, avg_days, inhabitants) {
 	for (let i = 0; i < dates.length; ++i) {
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			let sum = 0;
@@ -130,11 +154,9 @@ function processData(rows) {
 		}
 		dates.splice(i + 1, avg_days - 1);
 	}
-
-	updatePlot(dates, cantons, conf_cases_diff);
 }
 
-function updatePlot(dates, districts, new_conf_cases){
+function updatePlot(dates, districts, new_conf_cases, id){
 	var data = [{
 		type: 'heatmap',
 		x: dates,
@@ -147,7 +169,7 @@ function updatePlot(dates, districts, new_conf_cases){
 		title: 'Cantonal new confirmed cases over time',
 	};
 
-	Plotly.newPlot('overview', data, layout);
+	Plotly.newPlot(id, data, layout);
 };
 
 fetchData();
