@@ -21,5 +21,5 @@
 
 [Latest infection source data](https://maekke.github.io/visualize_latest_infection_source.html)
 
-## District data
-[New confirmed infections per district over time](https://maekke.github.io/visualize_districts.html)
+## New confirmed infections over time
+[New confirmed infections per district over time](https://maekke.github.io/visualize_new_conf_infections_district.html)
