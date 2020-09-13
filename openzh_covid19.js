@@ -31,6 +31,39 @@ function getCantons() {
 	return cantons;
 }
 
+function getCantonInhabitants() {
+	const inhabitants = {
+		AG: 678207,
+		AR: 55234,
+		AI: 16145,
+		BL: 288132,
+		BS: 194766,
+		BE: 1034977,
+		FR: 318714,
+		GE: 499480,
+		GL: 40403,
+		GR: 198379,
+		JU: 73419,
+		LU: 409577,
+		NE: 176850,
+		NW: 43223,
+		OW: 37841,
+		SH: 81991,
+		SZ: 159165,
+		SO: 273194,
+		SG: 507697,
+		TI: 353343,
+		TG: 276472,
+		UR: 36433,
+		VD: 799145,
+		VS: 343955,
+		ZH: 1520968,
+		ZG: 126837,
+		FL: 38114,
+	};
+	return inhabitants;
+}
+
 function getOpenZhCovid19Data(data_columns, callback) {
  	Plotly.d3.csv("https://raw.githubusercontent.com/openZH/covid_19/master/COVID19_Fallzahlen_CH_total_v2.csv",
 		function(rows){

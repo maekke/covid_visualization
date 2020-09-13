@@ -3,6 +3,7 @@
 <html>
 <head>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
 </head>
 <body>
 <div id="overview" style="width:100%; height:800px;"></div>
@@ -19,124 +20,58 @@ function fetchData() {
 };
 	
 function processData(rows) {
-	let dates = [];
-	let cantons = [];
+	let cantons = getCantons();
+	const inhabitants = getCantonInhabitants();
 
-	for (let i = 0; i < rows.length; i++) {
-		row = rows[i];
-		let date_val = row['date'];
-		let date_index = dates.indexOf(date_val);
-		if (date_index === -1) {
-			date_index = dates.length;
-			dates.push(date_val);
-		}
-
-		let canton = row['abbreviation_canton_and_fl'];
-		let canton_index = cantons.indexOf(canton);
-		if (canton_index === -1) {
-			canton_index = cantons.length;
-			cantons.push(canton);
-		}
-	}
-
-	let conf_cases = [];
-	conf_cases.length = cantons.length;
-	for (let i = 0; i < rows.length; i++) {
-		row = rows[i];
-		let date_val = row['date'];
-		let date_index = dates.indexOf(date_val);
-
-		let canton = row['abbreviation_canton_and_fl'];
-		let canton_index = cantons.indexOf(canton);
-
-		if (!conf_cases[canton_index]) {
-			conf_cases[canton_index] = [];
-			conf_cases[canton_index].size = dates.size;
-		}
-
-		let conf_case = row['ncumul_conf'];
-		conf_cases[canton_index][date_index] = conf_case;
-	}
-
-	// fill up missing data
-	for (let canton = 0; canton < cantons.length; ++canton) {
-		let last_value = conf_cases[canton][0];
-		for (let i = 1; i < dates.length; ++i) {
-			if (!conf_cases[canton][i]) {
-				conf_cases[canton][i] = last_value;
-			}
-			else {
-				last_value = conf_cases[canton][i];
+	getOpenZhCovid19Data(['ncumul_conf'], function(dates, data, data_column_name) {
+		// switch array index
+		let total_conf_cases = [];
+		total_conf_cases.size = cantons.length;
+		for (let c = 0; c < cantons.length; ++c) {
+			total_conf_cases[c] = []
+			total_conf_cases[c].length = data.length;
+			for (let d = 0; d < data.length; ++d) {
+				total_conf_cases[c][d] = data[d][c];
 			}
 		}
-	}
 
-	// create the difference
-	conf_cases_diff = [];
-	conf_cases_diff.size = conf_cases.size;
-	for (let canton = 0; canton < cantons.length; ++canton) {
-		conf_cases_diff[canton] = [0];
-		conf_cases_diff[canton].size = conf_cases[canton].size;
-		for (let i = 1; i < dates.length; ++i) {
-			conf_cases_diff[canton][i] = conf_cases[canton][i] - conf_cases[canton][i - 1]
+		// create the difference
+		let conf_cases_diff = [];
+		conf_cases_diff.size = total_conf_cases.size;
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			conf_cases_diff[canton] = [0];
+			conf_cases_diff[canton].size = total_conf_cases[canton].size;
+			for (let i = 1; i < dates.length; ++i) {
+				conf_cases_diff[canton][i] = total_conf_cases[canton][i] - total_conf_cases[canton][i - 1]
+			}
 		}
-	}
 
-	const inhabitants = {
-		AG: 678207,
-		AR: 55234,
-		AI: 16145,
-		BL: 288132,
-		BS: 194766,
-		BE: 1034977,
-		FR: 318714,
-		GE: 499480,
-		GL: 40403,
-		GR: 198379,
-		JU: 73419,
-		LU: 409577,
-		NE: 176850,
-		NW: 43223,
-		OW: 37841,
-		SH: 81991,
-		SZ: 159165,
-		SO: 273194,
-		SG: 507697,
-		TI: 353343,
-		TG: 276472,
-		UR: 36433,
-		VD: 799145,
-		VS: 343955,
-		ZH: 1520968,
-		ZG: 126837,
-		FL: 38114,
-	};
+		// keep a clone of the data for a subset
+		let dates_from_june = dates.slice();
+		let conf_cases_diff_from_june = JSON.parse(JSON.stringify(conf_cases_diff));
 
-	// keep a clone of the data for a subset
-	let dates_from_june = dates.slice();
-	let conf_cases_diff_from_june = JSON.parse(JSON.stringify(conf_cases_diff));
+		// average the full set and plot it
+		average_canton_data(dates, cantons, conf_cases_diff, 7, inhabitants);
+		updatePlot(dates, cantons, conf_cases_diff, 'overview');
 
-	// average the full set and plot it
-	average(dates, cantons, conf_cases_diff, 7, inhabitants);
-	updatePlot(dates, cantons, conf_cases_diff, 'overview');
-
-	// create a second plot from beginning of june
-	let index = dates_from_june.indexOf('2020-06-01')
-	if (index === -1) {
-		console.log('could not find 2020-06-01 entry!')
-		return;
-	}
-	// and remove everything before 2020-06-01.
-	for (let canton = 0; canton < cantons.length; ++canton) {
-		conf_cases_diff_from_june[canton].splice(0, index);
-	}
-	dates_from_june.splice(0, index);
-	// and average / output it.
-	average(dates_from_june, cantons, conf_cases_diff_from_june, 7, inhabitants);
-	updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, 'reduced');
+		// create a second plot from beginning of june
+		let index = dates_from_june.indexOf('2020-06-01')
+		if (index === -1) {
+			console.log('could not find 2020-06-01 entry!')
+			return;
+		}
+		// and remove everything before 2020-06-01.
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			conf_cases_diff_from_june[canton].splice(0, index);
+		}
+		dates_from_june.splice(0, index);
+		// and average / output it.
+		average_canton_data(dates_from_june, cantons, conf_cases_diff_from_june, 7, inhabitants);
+		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, 'reduced');
+	});
 }
 
-function average(dates, cantons, conf_cases_diff, avg_days, inhabitants) {
+function average_canton_data(dates, cantons, conf_cases_diff, avg_days, inhabitants) {
 	for (let i = 0; i < dates.length; ++i) {
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			let sum = 0;
