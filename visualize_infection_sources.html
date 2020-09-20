@@ -9,6 +9,7 @@
 <div id="plot_ag" style="width:100%; height:600px;"></div>
 <div id="plot_bs" style="width:100%; height:600px;"></div>
 <div id="plot_ge" style="width:100%; height:600px;"></div>
+<div id="plot_sh" style="width:100%; height:600px;"></div>
 <div id="plot_sz" style="width:100%; height:600px;"></div>
 <div id="plot_vs" style="width:100%; height:600px;"></div>
 <div id="plot_zg" style="width:100%; height:600px;"></div>
@@ -95,7 +96,7 @@ function makePlotly(canton) {
 	Plotly.newPlot('plot_' + canton, traces, layout);
 }
 
-let cantons = ['ag', 'bs', 'ge', 'sz', 'vs', 'zg', 'zh'];
+let cantons = ['ag', 'bs', 'ge', 'sh', 'sz', 'vs', 'zg', 'zh'];
 for (let i = 0; i < cantons.length; ++i) {
 	let canton = cantons[i];
 	makePlotly(canton);
