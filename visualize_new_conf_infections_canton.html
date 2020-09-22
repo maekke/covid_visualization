@@ -75,7 +75,7 @@ function average_canton_data(dates, cantons, conf_cases_diff, avg_days, inhabita
 	for (let i = 0; i < dates.length; ++i) {
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			let sum = 0;
-			for (let day = 0; day < avg_days; ++day) {
+			for (let day = 0; day < avg_days && i + day < conf_cases_diff[canton].length; ++day) {
 				sum += conf_cases_diff[canton][i + day];
 			}
 			if (cantons[canton] in inhabitants) {
