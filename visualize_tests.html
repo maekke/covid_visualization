@@ -10,7 +10,7 @@
 
 <script>
 
-function makeplot() {
+function fetchData() {
  	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/bag_data.csv",
 		function(data){
 			processData(data)
@@ -68,10 +68,10 @@ function processData(rows) {
 	];
 
 
-	makePlotly(traces);
+	createPlot(traces);
 }
 
-function makePlotly(traces){
+function createPlot(traces){
 	var layout = {
 		title: 'Performed PCR tests',
 		yaxis2: {
@@ -85,7 +85,7 @@ function makePlotly(traces){
 	Plotly.newPlot('isolated', traces, layout);
 };
 
-makeplot();
+fetchData();
 
 </script>
 
