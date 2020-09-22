@@ -19,10 +19,9 @@ function fetchData() {
 };
 	
 function processData(rows) {
-	console.log(rows);
-	var dates = [];
-	var total_pcr_tests = [];
-	var positivity_rate = [];
+	let dates = [];
+	let total_pcr_tests = [];
+	let positivity_rate = [];
 
 	for (let i = 0; i < rows.length; ++i) {
 		row = rows[i];
@@ -32,21 +31,17 @@ function processData(rows) {
 			positivity_rate.push(row['positivity_rate_percent']);
 		}
 	}
-	console.log('dates',dates);
-	console.log(positivity_rate);
 
-	var total_pcr_tests_inc = [];
+	let total_pcr_tests_inc = [];
 	total_pcr_tests_inc.push(0);
 	for (let i = 1; i < total_pcr_tests.length; ++i) {
 		total_pcr_tests_inc.push(total_pcr_tests[i] - total_pcr_tests[i - 1])
 	}
 	total_pcr_tests_inc[0] = total_pcr_tests_inc[1];
-	console.log(total_pcr_tests_inc);
 
-	var total_pcr_tests_inc_avg = average(total_pcr_tests_inc, 7);
-	console.log(total_pcr_tests_inc_avg);
+	let total_pcr_tests_inc_avg = average(total_pcr_tests_inc, 7);
 
-	var traces = [{
+	let traces = [{
 		x: dates,
 		y: total_pcr_tests_inc,
 		name: 'PCR tests',
@@ -66,7 +61,6 @@ function processData(rows) {
 		yaxis: 'y2',
 	},
 	];
-
 
 	createPlot(traces);
 }
