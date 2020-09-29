@@ -5,7 +5,10 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
+<div id="FR" style="width:100%; height:600px;"></div>
 <div id="GR" style="width:100%; height:600px;"></div>
+<div id="SG" style="width:100%; height:600px;"></div>
+<div id="SO" style="width:100%; height:600px;"></div>
 <div id="ZH" style="width:100%; height:600px;"></div>
 
 <script>
@@ -101,7 +104,10 @@ function updatePlot(weeks, districts, new_conf_cases, canton){
 	Plotly.newPlot(canton, data, layout);
 };
 
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv', 'FR');
 fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv', 'GR');
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv', 'SG');
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv', 'SO');
 fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv', 'ZH');
 
 </script>
