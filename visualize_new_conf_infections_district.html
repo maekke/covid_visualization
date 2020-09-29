@@ -75,7 +75,7 @@ function processData(rows, canton) {
 		for (let i = 0; i < weeks.length; ++i) {
 			for (let district = 0; district < districts.length; ++district) {
 				let sum = 0;
-				for (let day = 0; day < 7; ++day) {
+				for (let day = 0; day < 7 && i + day < new_conf_cases[district].length; ++day) {
 					sum += new_conf_cases[district][i + day];
 				}
 				new_conf_cases[district][i] = sum / 7;
