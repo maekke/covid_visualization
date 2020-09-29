@@ -71,7 +71,7 @@ function processData(rows, canton) {
 		new_conf_cases[district_index][week_index] = value;
 	}
 
-	if (date_mode) {
+	if (date_mode && weeks.length > 7) {
 		for (let i = 0; i < weeks.length; ++i) {
 			for (let district = 0; district < districts.length; ++district) {
 				let sum = 0;
