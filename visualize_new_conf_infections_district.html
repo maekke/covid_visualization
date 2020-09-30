@@ -79,7 +79,8 @@ function processData(rows, canton) {
 					sum += new_conf_cases[district][i + day];
 				}
 				new_conf_cases[district][i] = sum / 7;
-				new_conf_cases[district].splice(i + 1, 6);
+				let days = Math.min(7, new_conf_cases[district].length - i - 1);
+				new_conf_cases[district].splice(i + 1, days - 1);
 			}
 			weeks.splice(i + 1, 6);
 		}
