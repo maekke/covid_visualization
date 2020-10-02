@@ -97,6 +97,9 @@ function updatePlot(dates, districts, new_conf_cases, id){
 		x: dates,
 		y: districts,
 		z: new_conf_cases,
+		hovertemplate: 'Canton %{y} week/date %{x}: <b>%{z:.2f}</b>',
+		showlegend: false,
+		name: '',
 	},
 	];
 
