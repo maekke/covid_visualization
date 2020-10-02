@@ -102,6 +102,12 @@ function updatePlot(dates, districts, new_conf_cases, id){
 
 	layout = {
 		title: 'Cantonal new confirmed cases over time',
+		yaxis: {
+			fixedrange: true,
+		},
+		xaxis : {
+			fixedrange: true,
+		},
 	};
 
 	Plotly.newPlot(id, data, layout);
