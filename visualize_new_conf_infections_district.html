@@ -15,37 +15,35 @@
 
 <script>
 
-function fetchData(url, canton) {
+function fetchData(url, canton, useDate) {
  	Plotly.d3.csv(url,
 		function(data){
-			processData(data, canton)
+			processData(data, canton, useDate)
 		}
 	);
 };
 	
-function processData(rows, canton) {
+function processData(rows, canton, useDate) {
 	let weeks = [];
 	let districts = [];
-	let date_mode = false;
+	console.log('canton ' + canton + ', useDate: ' + useDate);
 
 	for (let i = 0; i < rows.length; i++) {
 		row = rows[i];
-		let week = row['Week'];
-		if (!week) {
-			week = row['Date'];
-			date_mode = true;
-		}
-		let week_index = weeks.indexOf(week);
-		if (week_index === -1) {
-			week_index = weeks.length;
-			weeks.push(week);
-		}
+		let week = useDate ? row['Date'] : row['Week'];
+		if (week !== "") {
+			let week_index = weeks.indexOf(week);
+			if (week_index === -1) {
+				week_index = weeks.length;
+				weeks.push(week);
+			}
 
-		let district = row['District'];
-		let district_index = districts.indexOf(district);
-		if (district_index === -1) {
-			district_index = districts.length;
-			districts.push(district);
+			let district = row['District'];
+			let district_index = districts.indexOf(district);
+			if (district_index === -1) {
+				district_index = districts.length;
+				districts.push(district);
+			}
 		}
 	}
 
@@ -53,27 +51,26 @@ function processData(rows, canton) {
 	new_conf_cases.length = districts.length;
 	for (let i = 0; i < rows.length; i++) {
 		row = rows[i];
-		let week = row['Week'];
-		if (!week) {
-			week = row['Date'];
+		let week = useDate ? row['Date'] : row['Week'];
+		if (week !== "") {
+			let week_index = weeks.indexOf(week);
+
+			let district = row['District'];
+			let district_index = districts.indexOf(district);
+
+			if (!new_conf_cases[district_index]) {
+				new_conf_cases[district_index] = [];
+				new_conf_cases[district_index].size = weeks.size;
+			}
+
+			let new_conf_case = row['NewConfCases'];
+			let population = row['Population'];
+			let value = new_conf_case / population * 100000;
+			new_conf_cases[district_index][week_index] = value;
 		}
-		let week_index = weeks.indexOf(week);
-
-		let district = row['District'];
-		let district_index = districts.indexOf(district);
-
-		if (!new_conf_cases[district_index]) {
-			new_conf_cases[district_index] = [];
-			new_conf_cases[district_index].size = weeks.size;
-		}
-
-		let new_conf_case = row['NewConfCases'];
-		let population = row['Population'];
-		let value = new_conf_case / population * 100000;
-		new_conf_cases[district_index][week_index] = value;
 	}
 
-	if (date_mode && weeks.length > 14) {
+	if (useDate && weeks.length > 14) {
 		for (let i = 0; i < weeks.length; ++i) {
 			for (let district = 0; district < districts.length; ++district) {
 				let sum = 0;
@@ -116,13 +113,13 @@ function updatePlot(weeks, districts, new_conf_cases, canton){
 	Plotly.newPlot(canton, data, layout);
 };
 
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BE_bezirk.csv', 'BE');
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv', 'FR');
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv', 'GR');
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv', 'SG');
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv', 'SO');
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_VS_bezirk.csv', 'VS');
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv', 'ZH');
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BE_bezirk.csv', 'BE', true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv', 'FR', false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv', 'GR', true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv', 'SG', true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv', 'SO', true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_VS_bezirk.csv', 'VS', false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv', 'ZH', false);
 
 </script>
 
