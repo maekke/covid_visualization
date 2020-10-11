@@ -48,11 +48,11 @@ function processData(rows) {
 
 		// keep a clone of the data for a subset
 		let dates_from_june = dates.slice();
-		let conf_cases_diff_from_june = JSON.parse(JSON.stringify(conf_cases_diff));
+		let conf_cases_diff_from_june = clone_data(conf_cases_diff);
 
 		// average the full set and plot it
 		average_canton_data(dates, cantons, conf_cases_diff, 7);
-		let conf_cases_diff_per100k = JSON.parse(JSON.stringify(conf_cases_diff));
+		let conf_cases_diff_per100k = clone_data(conf_cases_diff);
 		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
 		updatePlot(dates, cantons, conf_cases_diff_per100k, conf_cases_diff, 'overview');
 
@@ -73,6 +73,19 @@ function processData(rows) {
 		scale_inhabitants(dates_from_june, cantons, conf_cases_diff_from_june_per100k , inhabitants);
 		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, conf_cases_diff_from_june, 'reduced');
 	});
+}
+
+function clone_data(conf_cases) {
+	let result = [];
+	result.length = conf_cases.length;
+	for (let canton = 0; canton < conf_cases.length; ++canton) {
+		result[canton] = [];
+		result[canton].length = conf_cases[canton].length;
+		for (let i = 0; i < conf_cases[canton].length; ++i) {
+			result[canton][i] = conf_cases[canton][i];
+		}
+	}
+	return result;
 }
 
 function average_canton_data(dates, cantons, conf_cases_diff, avg_days) {
