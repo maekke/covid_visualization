@@ -47,7 +47,9 @@ function processData(rows, canton, useDate) {
 	}
 
 	let new_conf_cases = [];
+	let new_conf_cases_per100k = [];
 	new_conf_cases.length = districts.length;
+	new_conf_cases_per100k.length = districts.length;
 	for (let i = 0; i < rows.length; i++) {
 		row = rows[i];
 		let week = useDate ? row['Date'] : row['Week'];
@@ -60,12 +62,15 @@ function processData(rows, canton, useDate) {
 			if (!new_conf_cases[district_index]) {
 				new_conf_cases[district_index] = [];
 				new_conf_cases[district_index].size = weeks.size;
+				new_conf_cases_per100k[district_index] = [];
+				new_conf_cases_per100k[district_index].size = weeks.size;
 			}
 
 			let new_conf_case = row['NewConfCases'];
 			let population = row['Population'];
 			let value = new_conf_case / population * 100000;
-			new_conf_cases[district_index][week_index] = value;
+			new_conf_cases[district_index][week_index] = new_conf_case;
+			new_conf_cases_per100k[district_index][week_index] = value;
 		}
 	}
 
@@ -73,29 +78,34 @@ function processData(rows, canton, useDate) {
 		for (let i = 0; i < weeks.length; ++i) {
 			for (let district = 0; district < districts.length; ++district) {
 				let sum = 0;
+				let sum_per100k = 0;
 				for (let day = 0; day < 7 && i + day < new_conf_cases[district].length; ++day) {
 					sum += new_conf_cases[district][i + day];
+					sum_per100k += new_conf_cases_per100k[district][i + day];
 				}
 				new_conf_cases[district][i] = sum / 7;
+				new_conf_cases_per100k[district][i] = sum_per100k / 7;
 				let days = Math.min(7, new_conf_cases[district].length - i - 1);
 				new_conf_cases[district].splice(i + 1, days - 1);
+				new_conf_cases_per100k[district].splice(i + 1, days - 1);
 			}
 			weeks.splice(i + 1, 6);
 		}
 	}
 
-	updatePlot(weeks, districts, new_conf_cases, canton);
+	updatePlot(weeks, districts, new_conf_cases_per100k, canton, new_conf_cases);
 }
 
-function updatePlot(weeks, districts, new_conf_cases, canton){
+function updatePlot(weeks, districts, new_conf_cases_per100k, canton, new_conf_cases){
 	var data = [{
 		type: 'heatmap',
 		x: weeks,
 		y: districts,
-		z: new_conf_cases,
+		z: new_conf_cases_per100k,
+		text: new_conf_cases,
 		zmin: 0,
 		zmax: 80,
-		hovertemplate: 'District %{y} week/date %{x}: <b>%{z:.2f}</b>',
+		hovertemplate: 'District %{y} week/date %{x}:<br />Per 100k: <b>%{z:.2f}</b><br />Absolute cases: %{text}',
 		showlegend: false,
 		name: '',
 	},
