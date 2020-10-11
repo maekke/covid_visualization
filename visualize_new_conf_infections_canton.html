@@ -51,8 +51,10 @@ function processData(rows) {
 		let conf_cases_diff_from_june = JSON.parse(JSON.stringify(conf_cases_diff));
 
 		// average the full set and plot it
-		average_canton_data(dates, cantons, conf_cases_diff, 7, inhabitants);
-		updatePlot(dates, cantons, conf_cases_diff, 'overview');
+		average_canton_data(dates, cantons, conf_cases_diff, 7);
+		let conf_cases_diff_per100k = JSON.parse(JSON.stringify(conf_cases_diff));
+		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
+		updatePlot(dates, cantons, conf_cases_diff_per100k, conf_cases_diff, 'overview');
 
 		// create a second plot from beginning of june
 		let index = dates_from_june.indexOf('2020-06-01')
@@ -66,23 +68,19 @@ function processData(rows) {
 		}
 		dates_from_june.splice(0, index);
 		// and average / output it.
-		average_canton_data(dates_from_june, cantons, conf_cases_diff_from_june, 7, inhabitants);
-		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, 'reduced');
+		average_canton_data(dates_from_june, cantons, conf_cases_diff_from_june, 7);
+		let conf_cases_diff_from_june_per100k = JSON.parse(JSON.stringify(conf_cases_diff_from_june));
+		scale_inhabitants(dates_from_june, cantons, conf_cases_diff_from_june_per100k , inhabitants);
+		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, conf_cases_diff_from_june, 'reduced');
 	});
 }
 
-function average_canton_data(dates, cantons, conf_cases_diff, avg_days, inhabitants) {
+function average_canton_data(dates, cantons, conf_cases_diff, avg_days) {
 	for (let i = 0; i < dates.length; ++i) {
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			let sum = 0;
 			for (let day = 0; day < avg_days && i + day < conf_cases_diff[canton].length; ++day) {
 				sum += conf_cases_diff[canton][i + day];
-			}
-			if (cantons[canton] in inhabitants) {
-				sum = sum / inhabitants[cantons[canton]] * 100000;
-			}
-			else {
-				console.log('canton ' + cantons[canton] + ' not found!');
 			}
 			conf_cases_diff[canton][i] = sum;
 			conf_cases_diff[canton].splice(i + 1, avg_days - 1);
@@ -91,13 +89,27 @@ function average_canton_data(dates, cantons, conf_cases_diff, avg_days, inhabita
 	}
 }
 
-function updatePlot(dates, districts, new_conf_cases, id){
+function scale_inhabitants(dates, cantons, conf_cases_diff, inhabitants) {
+	for (let i = 0; i < dates.length; ++i) {
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			if (cantons[canton] in inhabitants) {
+				conf_cases_diff[canton][i] = conf_cases_diff[canton][i] / inhabitants[cantons[canton]] * 100000;
+			}
+			else {
+				console.log('canton ' + cantons[canton] + ' not found!');
+			}
+		}
+	}
+}
+
+function updatePlot(dates, districts, new_conf_cases_avg, new_conf_cases, id){
 	var data = [{
 		type: 'heatmap',
 		x: dates,
 		y: districts,
-		z: new_conf_cases,
-		hovertemplate: 'Canton %{y} week/date %{x}: <b>%{z:.2f}</b>',
+		z: new_conf_cases_avg,
+		text: new_conf_cases,
+		hovertemplate: 'Canton %{y} week/date %{x}:<br /><b>%{z:.2f}</b> per 100k<br />Total %{text}',
 		showlegend: false,
 		name: '',
 	},
