@@ -13,6 +13,9 @@
 
 [Weekly performed PCR tests per canton from BAG](https://maekke.github.io/visualize_tests_per_canton.html)
 
+## Covid data overview of Switzerland
+[CH covid data overview](https://maekke.github.io/visualize_ch.html)
+
 ## Cantonal data
 [Cantonal covid data](https://maekke.github.io/visualize_canton.html)
 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot" style="width:100%; height:600px;"></div>
+
+<script>
+
+function fetchData() {
+	getOpenZhCovid19Data(['ncumul_conf', 'current_hosp', 'ncumul_deceased', 'current_isolated', 'current_quarantined'], function(dates, data, data_column) {
+		let data_sum = sumCantonalData(data);
+		let data_sum_inc = diffData(data_sum);
+
+		let trace = null;
+		if (data_column === 'ncumul_conf') {
+			trace = {
+				x: dates,
+				y: data_sum_inc,
+				name: 'Confirmed COVID-19 cases',
+				type: 'bar',
+			};
+		}
+		else if (data_column === 'current_hosp') {
+			trace = {
+				x: dates,
+				y: data_sum,
+				name: 'Hospitalized',
+				type: 'bar',
+				visible: 'legendonly',
+			};
+		}
+		else if (data_column === 'ncumul_deceased') {
+			trace = {
+				x: dates,
+				y: data_sum_inc,
+				name: 'Deceased',
+				type: 'bar',
+				visible: 'legendonly',
+			};
+		}
+		else if (data_column === 'current_isolated') {
+			trace = {
+				x: dates,
+				y: data_sum,
+				name: 'Isolated',
+				type: 'bar',
+				visible: 'legendonly',
+			};
+		}
+		else if (data_column === 'current_quarantined') {
+			trace = {
+				x: dates,
+				y: data_sum,
+				name: 'Quarantined',
+				type: 'bar',
+				visible: 'legendonly',
+			};
+		}
+
+		let plotDiv = document.getElementById('plot');
+		if (trace !== null) {
+			Plotly.addTraces(plotDiv, trace);
+		}
+		else {
+			console.error('trace is unassigned!');
+		}
+	});
+}
+
+function initPlotly(){
+	let traces = [];
+	let layout = {
+		title: 'Overview',
+	};
+
+	Plotly.newPlot('plot', traces, layout);
+};
+
+initPlotly();
+fetchData();
+
+</script>
+
+</body>
+</html>
