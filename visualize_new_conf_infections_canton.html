@@ -71,7 +71,7 @@ function processData(rows) {
 		average_canton_data(dates_from_june, cantons, conf_cases_diff_from_june, 7);
 		let conf_cases_diff_from_june_per100k = JSON.parse(JSON.stringify(conf_cases_diff_from_june));
 		scale_inhabitants(dates_from_june, cantons, conf_cases_diff_from_june_per100k , inhabitants);
-		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june, conf_cases_diff_from_june, 'reduced');
+		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june_per100k, conf_cases_diff_from_june, 'reduced');
 	});
 }
 
