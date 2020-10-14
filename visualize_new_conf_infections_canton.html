@@ -124,6 +124,8 @@ function updatePlot(dates, districts, new_conf_cases_avg, new_conf_cases, id){
 		y: districts,
 		z: new_conf_cases_avg,
 		text: new_conf_cases,
+		zmin: 0,
+		zmax: 180,
 		hovertemplate: 'Canton %{y} week/date %{x}:<br /><b>%{z:.2f}</b> per 100k<br />Total %{text}',
 		showlegend: false,
 		name: '',
