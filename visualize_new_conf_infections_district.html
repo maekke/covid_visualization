@@ -83,8 +83,8 @@ function processData(rows, canton, useDate) {
 					sum += new_conf_cases[district][i + day];
 					sum_per100k += new_conf_cases_per100k[district][i + day];
 				}
-				new_conf_cases[district][i] = sum / 7;
-				new_conf_cases_per100k[district][i] = sum_per100k / 7;
+				new_conf_cases[district][i] = sum;
+				new_conf_cases_per100k[district][i] = sum_per100k;
 				let days = Math.min(7, new_conf_cases[district].length - i - 1);
 				new_conf_cases[district].splice(i + 1, days - 1);
 				new_conf_cases_per100k[district].splice(i + 1, days - 1);
