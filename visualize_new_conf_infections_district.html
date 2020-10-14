@@ -85,11 +85,12 @@ function processData(rows, canton, useDate) {
 				}
 				new_conf_cases[district][i] = sum;
 				new_conf_cases_per100k[district][i] = sum_per100k;
-				let days = Math.min(7, new_conf_cases[district].length - i - 1);
+				let days = Math.min(7, new_conf_cases[district].length - i);
 				new_conf_cases[district].splice(i + 1, days - 1);
 				new_conf_cases_per100k[district].splice(i + 1, days - 1);
 			}
-			weeks.splice(i + 1, 6);
+			let days = Math.min(7, weeks.length - i);
+			weeks.splice(i + 1, days - 1);
 		}
 	}
 
