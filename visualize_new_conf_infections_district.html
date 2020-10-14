@@ -66,8 +66,8 @@ function processData(rows, canton, useDate) {
 				new_conf_cases_per100k[district_index].size = weeks.size;
 			}
 
-			let new_conf_case = row['NewConfCases'];
-			let population = row['Population'];
+			let new_conf_case = parseInt(row['NewConfCases']);
+			let population = parseInt(row['Population']);
 			let value = new_conf_case / population * 100000;
 			new_conf_cases[district_index][week_index] = new_conf_case;
 			new_conf_cases_per100k[district_index][week_index] = value;
