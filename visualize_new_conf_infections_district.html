@@ -74,7 +74,7 @@ function processData(rows, canton, useDate) {
 		}
 	}
 
-	if (useDate && weeks.length > 14) {
+	if (useDate) {
 		for (let i = 0; i < weeks.length; ++i) {
 			for (let district = 0; district < districts.length; ++district) {
 				let sum = 0;
