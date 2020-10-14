@@ -96,9 +96,11 @@ function average_canton_data(dates, cantons, conf_cases_diff, avg_days) {
 				sum += conf_cases_diff[canton][i + day];
 			}
 			conf_cases_diff[canton][i] = sum;
-			conf_cases_diff[canton].splice(i + 1, avg_days - 1);
+			let limit = Math.min(avg_days, conf_cases_diff[canton].length - i);
+			conf_cases_diff[canton].splice(i + 1, limit - 1);
 		}
-		dates.splice(i + 1, avg_days - 1);
+		let limit = Math.min(avg_days, dates.length - i);
+		dates.splice(i + 1, limit - 1);
 	}
 }
 
