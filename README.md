@@ -16,6 +16,8 @@
 ## Covid data overview of Switzerland
 [CH covid data overview](https://maekke.github.io/visualize_ch.html)
 
+[CH covid data overview as spiral](https://maekke.github.io/visualize_ch_spiral.html)
+
 ## Cantonal data
 [Cantonal covid data](https://maekke.github.io/visualize_canton.html)
 
