@@ -19,17 +19,17 @@ function fetchData() {
 		for (let w = 0; w < 4; ++w) {
 			let cases1 = [];
 			let dates1 = [];
-			for (let i = data_sum_inc.length - (w * 7 + 8); i < data_sum_inc.length - (w * 7 + 1); ++i) {
+			for (let i = data_sum_inc.length - (w * 7 + 7); i < data_sum_inc.length - (w * 7); ++i) {
 				cases1.push(data_sum_inc[i]);
 				dates1.push("&nbsp;" + dates[i]);
 				if (dates0.length < 8) {
 					dates0.push("&nbsp;" + dates[i]);
 				}
 			}
-			cases1.push(data_sum_inc[data_sum_inc.length - (w * 7 + 8)]);
-			dates1.push("&nbsp;" + dates[data_sum_inc.length - (w * 7 + 8)]);
+			cases1.push(data_sum_inc[data_sum_inc.length - (w * 7 + 7)]);
+			dates1.push("&nbsp;" + dates[data_sum_inc.length - (w * 7 + 7)]);
 			if (dates0.length < 8) {
-				dates0.push("&nbsp;" + dates[data_sum_inc.length - (w * 7 + 8)]);
+				dates0.push("&nbsp;" + dates[data_sum_inc.length - (w * 7 + 7)]);
 			}
 
 			let trace = {
