@@ -51,16 +51,18 @@ function fetchData() {
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			labels.push(cantons[canton]);
 			parents.push("CH");
+
 			let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - 1];
 			val = Math.round(val*10)/10;
 			values.push(val);
 			sum += val;
+
 			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - 1];
 			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
 			tot_sum += tot_val;
 		}
 		values[0] = sum;
-		tot_text[0] = tot_sum;
+		tot_text[0] = "cases per 100k: " + sum.toFixed(1) + "<br />total cases: " + tot_sum;
 
 		updatePlot(labels, parents, values, tot_text);
 	});
