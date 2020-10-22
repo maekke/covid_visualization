@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot" style="width:100%; height:800px;"></div>
+
+<script>
+
+function fetchData() {
+	let cantons = getCantons();
+	const inhabitants = getCantonInhabitants();
+
+	getOpenZhCovid19Data(['ncumul_conf'], function(dates, data, data_column_name) {
+		// switch array index
+		let total_conf_cases = [];
+		total_conf_cases.size = cantons.length;
+		for (let c = 0; c < cantons.length; ++c) {
+			total_conf_cases[c] = []
+			total_conf_cases[c].length = data.length;
+			for (let d = 0; d < data.length; ++d) {
+				total_conf_cases[c][d] = data[d][c];
+			}
+		}
+
+		// create the difference
+		let conf_cases_diff = [];
+		conf_cases_diff.size = total_conf_cases.size;
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			conf_cases_diff[canton] = [0];
+			conf_cases_diff[canton].size = total_conf_cases[canton].size;
+			for (let i = 1; i < dates.length; ++i) {
+				conf_cases_diff[canton][i] = total_conf_cases[canton][i] - total_conf_cases[canton][i - 1]
+			}
+		}
+
+		// scale per 100k
+		let conf_cases_diff_per100k = clone_data(conf_cases_diff);
+		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
+
+		let labels = ["CH"];
+		let parents = [""]
+		let values = [0];
+		let sum = 0;
+		let tot_text = [0];
+		let tot_sum = 0;
+
+		// get latest values only
+		let conf_cases_diff_per100k_last = [];
+		let conf_cases_diff_last = [];
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			conf_cases_diff_per100k_last.push(conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - 1]);
+			conf_cases_diff_last.push(conf_cases_diff[canton][conf_cases_diff[canton].length - 1]);
+
+			labels.push(cantons[canton]);
+			parents.push("CH");
+			let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - 1];
+			values.push(val);
+			sum += val;
+			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - 1];
+			tot_text.push("cases per 100k: " + val.toFixed(1) + "<br />total cases: " + tot_val);
+			tot_sum += tot_val;
+		}
+		values[0] = sum;
+		tot_text[0] = tot_sum;
+
+		updatePlot(labels, parents, values, tot_text);
+	});
+}
+
+function clone_data(conf_cases) {
+	let result = [];
+	result.length = conf_cases.length;
+	for (let canton = 0; canton < conf_cases.length; ++canton) {
+		result[canton] = [];
+		result[canton].length = conf_cases[canton].length;
+		for (let i = 0; i < conf_cases[canton].length; ++i) {
+			result[canton][i] = conf_cases[canton][i];
+		}
+	}
+	return result;
+}
+
+function scale_inhabitants(dates, cantons, conf_cases_diff, inhabitants) {
+	for (let i = 0; i < dates.length; ++i) {
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			if (cantons[canton] in inhabitants) {
+				conf_cases_diff[canton][i] = conf_cases_diff[canton][i] / inhabitants[cantons[canton]] * 100000;
+			}
+			else {
+				console.log('canton ' + cantons[canton] + ' not found!');
+			}
+		}
+	}
+}
+
+//function updatePlot(dates, cantons, new_conf_cases_avg, new_conf_cases){
+//function updatePlot(labels, parents, values){
+function updatePlot(labels, parents, values, text){
+	var data = [{
+		"type": "sunburst",
+		//"labels": [cantons],
+		//"labels": [cantons],
+		//"labels": ["CH", "ZH", "ZG", "8003", "8004", "ZG-1"],
+		"labels": labels,
+		//"parents": ["", "Eve", "Eve", "Seth", "Seth", "Eve", "Eve", "Awan", "Eve" ],
+		//"parents": [cantons],
+		//"parents": ["", "CH", "CH", "ZH", "ZH", "ZG"],
+		"parents": parents,
+		"text": text,
+		//"values":  [65, 14, 12, 10, 2, 6, 6, 4, 4],
+		//"values":  new_conf_cases_avg,
+		//"values":  [10, 4, 6, 1, 3, 6],
+		"values":  values,
+		//"leaf": {"opacity": 0.4},
+		"marker": {"line": {"width": 2}},
+		"branchvalues": 'total'
+	},
+	];
+	console.log(data)
+
+	layout = {
+		"margin": {"l": 0, "r": 0, "b": 0, "t": 0},
+		//title: 'Cantonal new confirmed cases over time',
+		/*
+		yaxis: {
+			fixedrange: true,
+		},
+		xaxis : {
+			fixedrange: true,
+		},
+		*/
+	};
+
+	Plotly.newPlot('plot', data, layout);
+};
+
+fetchData();
+//updatePlot();
+
+</script>
+
+</body>
+</html>
