@@ -52,10 +52,11 @@ function fetchData() {
 			labels.push(cantons[canton]);
 			parents.push("CH");
 			let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - 1];
+			val = Math.round(val*10)/10;
 			values.push(val);
 			sum += val;
 			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - 1];
-			tot_text.push("cases per 100k: " + val.toFixed(1) + "<br />total cases: " + tot_val);
+			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
 			tot_sum += tot_val;
 		}
 		values[0] = sum;
