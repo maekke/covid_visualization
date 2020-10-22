@@ -18,7 +18,7 @@
 
 [CH covid data overview as spiral](https://maekke.github.io/visualize_ch_spiral.html)
 
-[CH covid data overview as sunburst](https://maekke.github.io/visualize_ch_sunburst.html)
+[CH covid data overview as sunburst](https://maekke.github.io/visualize_new_conf_infections_sunburst.html)
 
 ## Cantonal data
 [Cantonal covid data](https://maekke.github.io/visualize_canton.html)
