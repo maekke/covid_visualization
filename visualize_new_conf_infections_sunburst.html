@@ -4,6 +4,7 @@
 <head>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="openzh_covid19.js"></script>
+<script src="https://d3js.org/d3-queue.v3.min.js"></script>
 </head>
 <body>
 <div id="plot" style="width:100%; height:800px;"></div>
@@ -41,31 +42,76 @@ function fetchData() {
 		let conf_cases_diff_per100k = clone_data(conf_cases_diff);
 		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
 
+		// TODO make this configurable via UI
+		const date_index = 1;
+
 		let labels = ["CH"];
 		let parents = [""]
 		let values = [0];
 		let sum = 0;
 		let tot_text = [0];
 		let tot_sum = 0;
+		let used_date = dates[dates.length - date_index];
 
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			labels.push(cantons[canton]);
 			parents.push("CH");
 
-			let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - 1];
+			let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - date_index];
 			val = Math.round(val*10)/10;
 			values.push(val);
 			sum += val;
 
-			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - 1];
+			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - date_index];
 			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
 			tot_sum += tot_val;
 		}
 		values[0] = sum;
-		tot_text[0] = "cases per 100k: " + sum.toFixed(1) + "<br />total cases: " + tot_sum;
+		//tot_text[0] = "cases per 100k: " + sum.toFixed(1) + "<br />total cases: " + tot_sum;
+		tot_text[0] = "total cases: " + tot_sum + "<br />" + used_date;
 
-		updatePlot(labels, parents, values, tot_text);
+		let queue = d3.queue();
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BL_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv');
+		queue.awaitAll(function(err, result) {
+
+			for (let i = 0; i < result.length; ++i) {
+				processDistrict(result[i], labels, parents, values, tot_text, used_date);
+			}
+
+			updatePlot(labels, parents, values, tot_text);
+		});
 	});
+}
+
+function processDistrict(data, labels, parents, values, tot_text, used_date) {
+	let values_district = [];
+	let values_district_sum = 0;
+	for (let i = 0; i < data.length; ++i) {
+		row = data[i];
+		if (row["Date"] === used_date && row["DistrictId"] !== "") {
+			labels.push(row["District"]);
+			parents.push(row["Canton"]);
+			let tot_val = row["NewConfCases"];
+			let val = tot_val / row["Population"] * 100e3;
+			val = Math.round(val*10)/10;
+			values_district.push(val);
+			values_district_sum += val;
+			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
+		}
+	}
+
+	// scale things to per 100k cantonal value,
+	// since this is unrelated to the district per 100k values
+	let index = labels.indexOf(data[0]["Canton"]);
+	let canton_value = values[index];
+	let factor = canton_value / values_district_sum;
+	for (let i = 0; i < values_district.length; ++i) {
+		values.push(values_district[i] * factor);
+	}
 }
 
 function clone_data(conf_cases) {
@@ -85,7 +131,7 @@ function scale_inhabitants(dates, cantons, conf_cases_diff, inhabitants) {
 	for (let i = 0; i < dates.length; ++i) {
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			if (cantons[canton] in inhabitants) {
-				conf_cases_diff[canton][i] = conf_cases_diff[canton][i] / inhabitants[cantons[canton]] * 100000;
+				conf_cases_diff[canton][i] = conf_cases_diff[canton][i] / inhabitants[cantons[canton]] * 100e3;
 			}
 			else {
 				console.log('canton ' + cantons[canton] + ' not found!');
@@ -102,7 +148,7 @@ function updatePlot(labels, parents, values, text){
 		"text": text,
 		"values":  values,
 		"marker": {"line": {"width": 2}},
-		"branchvalues": 'total'
+		"branchvalues": "total",
 	},
 	];
 
