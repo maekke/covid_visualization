@@ -52,6 +52,7 @@ function fetchData() {
 		let tot_text = [0];
 		let tot_sum = 0;
 		let used_date = dates[dates.length - date_index];
+		let tot_inhabitants = 0;
 
 		for (let canton = 0; canton < cantons.length; ++canton) {
 			labels.push(cantons[canton]);
@@ -65,10 +66,13 @@ function fetchData() {
 			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - date_index];
 			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
 			tot_sum += tot_val;
+
+			tot_inhabitants += inhabitants[cantons[canton]];
 		}
 		values[0] = sum;
-		//tot_text[0] = "cases per 100k: " + sum.toFixed(1) + "<br />total cases: " + tot_sum;
-		tot_text[0] = "total cases: " + tot_sum + "<br />" + used_date;
+		let tot_cases_per100k = tot_sum / tot_inhabitants * 100e3;
+		tot_cases_per100k = Math.round(tot_cases_per100k * 10) / 10;
+		tot_text[0] = "cases per 100k: " + tot_cases_per100k  + "<br />total cases: " + tot_sum + "<br />" +  used_date;
 
 		let queue = d3.queue();
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BL_bezirk.csv');
