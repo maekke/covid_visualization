@@ -80,6 +80,8 @@ function fetchData() {
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_VS_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv');
 		queue.awaitAll(function(err, result) {
 
 			for (let i = 0; i < result.length; ++i) {
@@ -94,23 +96,36 @@ function fetchData() {
 function processDistrict(data, labels, parents, values, tot_text, used_date) {
 	let values_district = [];
 	let values_district_sum = 0;
+	const used_date_as_date = new Date(used_date);
+	const week_number = getNumberOfWeek(used_date_as_date).toString();
+
+	let canton = data[0]["Canton"];
+	if (!canton || canton === "") {
+		canton = "ZH";
+	}
+	const use_week = canton == "ZH" || canton == "VS";
+
 	for (let i = 0; i < data.length; ++i) {
 		row = data[i];
-		if (row["Date"] === used_date && row["DistrictId"] !== "") {
+		if ((row["Date"] === used_date && !use_week || row["Week"] === week_number && use_week) && row["DistrictId"] !== "") {
 			labels.push(row["District"]);
-			parents.push(row["Canton"]);
+			parents.push(canton);
 			let tot_val = row["NewConfCases"];
 			let val = tot_val / row["Population"] * 100e3;
 			val = Math.round(val*10)/10;
 			values_district.push(val);
 			values_district_sum += val;
-			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
+			let text = "cases per 100k: " + val + "<br />total cases: " + tot_val;
+			if (use_week) {
+				text += "<br />*Weekly case numbers";
+			}
+			tot_text.push(text);
 		}
 	}
 
 	// scale things to per 100k cantonal value,
 	// since this is unrelated to the district per 100k values
-	let index = labels.indexOf(data[0]["Canton"]);
+	let index = labels.indexOf(canton);
 	let canton_value = values[index];
 	let factor = canton_value / values_district_sum;
 	for (let i = 0; i < values_district.length; ++i) {
@@ -142,6 +157,25 @@ function scale_inhabitants(dates, cantons, conf_cases_diff, inhabitants) {
 			}
 		}
 	}
+}
+
+function getNumberOfWeek(today) {
+	if (today == null) {
+		today = new Date();
+	}
+	return ISO8601_week_no(today);
+}
+
+function ISO8601_week_no(dt) {
+	let tdt = new Date(dt.valueOf());
+	let dayn = (dt.getDay() + 6) % 7;
+	tdt.setDate(tdt.getDate() - dayn + 3);
+	let firstThursday = tdt.valueOf();
+	tdt.setMonth(0, 1);
+	if (tdt.getDay() !== 4) {
+		tdt.setMonth(0, 1 + ((4 - tdt.getDay()) + 7) % 7);
+	}
+	return 1 + Math.ceil((firstThursday - tdt) / 604800000);
 }
 
 function updatePlot(labels, parents, values, text){
