@@ -80,6 +80,7 @@ function fetchData() {
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv');
+		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_TG_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_VS_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv');
 		queue.awaitAll(function(err, result) {
@@ -103,7 +104,7 @@ function processDistrict(data, labels, parents, values, tot_text, used_date) {
 	if (!canton || canton === "") {
 		canton = "ZH";
 	}
-	const use_week = canton == "ZH" || canton == "VS";
+	const use_week = canton == "ZH" || canton == "VS" || canton == "TG";
 
 	for (let i = 0; i < data.length; ++i) {
 		row = data[i];
