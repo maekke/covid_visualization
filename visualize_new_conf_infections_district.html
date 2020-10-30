@@ -47,7 +47,9 @@ function processData(rows, canton, useDate) {
 			}
 		}
 	}
-	weeks.sort();
+	weeks.sort(function (a, b) {
+		return parseInt(a) - parseInt(b);
+	});
 
 	let new_conf_cases = [];
 	let new_conf_cases_per100k = [];
