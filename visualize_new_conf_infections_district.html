@@ -20,7 +20,7 @@
 function fetchData(url, canton, useDate) {
  	Plotly.d3.csv(url,
 		function(data){
-			processData(data, canton, useDate)
+			processData(data, canton, useDate);
 		}
 	);
 };
