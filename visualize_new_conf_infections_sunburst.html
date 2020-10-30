@@ -7,7 +7,20 @@
 <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 </head>
 <body>
-<div id="plot" style="width:100%; height:800px;"></div>
+<div id="plot1" style="width:100%; height:800px;"></div>
+<div id="plot2" style="width:100%; height:800px;"></div>
+<div id="plot3" style="width:100%; height:800px;"></div>
+<div id="plot4" style="width:100%; height:800px;"></div>
+<div id="plot5" style="width:100%; height:800px;"></div>
+<div id="plot6" style="width:100%; height:800px;"></div>
+<div id="plot7" style="width:100%; height:800px;"></div>
+<div id="plot8" style="width:100%; height:800px;"></div>
+<div id="plot9" style="width:100%; height:800px;"></div>
+<div id="plot10" style="width:100%; height:800px;"></div>
+<div id="plot11" style="width:100%; height:800px;"></div>
+<div id="plot12" style="width:100%; height:800px;"></div>
+<div id="plot13" style="width:100%; height:800px;"></div>
+<div id="plot14" style="width:100%; height:800px;"></div>
 
 <script>
 
@@ -42,38 +55,6 @@ function fetchData() {
 		let conf_cases_diff_per100k = clone_data(conf_cases_diff);
 		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
 
-		// TODO make this configurable via UI
-		const date_index = 1;
-
-		let labels = ["CH"];
-		let parents = [""]
-		let values = [0];
-		let sum = 0;
-		let tot_text = [0];
-		let tot_sum = 0;
-		let used_date = dates[dates.length - date_index];
-		let tot_inhabitants = 0;
-
-		for (let canton = 0; canton < cantons.length; ++canton) {
-			labels.push(cantons[canton]);
-			parents.push("CH");
-
-			let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - date_index];
-			val = Math.round(val*10)/10;
-			values.push(val);
-			sum += val;
-
-			let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - date_index];
-			tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
-			tot_sum += tot_val;
-
-			tot_inhabitants += inhabitants[cantons[canton]];
-		}
-		values[0] = sum;
-		let tot_cases_per100k = tot_sum / tot_inhabitants * 100e3;
-		tot_cases_per100k = Math.round(tot_cases_per100k * 10) / 10;
-		tot_text[0] = "cases per 100k: " + tot_cases_per100k  + "<br />total cases: " + tot_sum + "<br />" +  used_date;
-
 		let queue = d3.queue();
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BL_bezirk.csv');
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv');
@@ -85,11 +66,44 @@ function fetchData() {
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv');
 		queue.awaitAll(function(err, result) {
 
-			for (let i = 0; i < result.length; ++i) {
-				processDistrict(result[i], labels, parents, values, tot_text, used_date);
-			}
+			for (let date_index = 1; date_index <= 14; ++date_index) {
 
-			updatePlot(labels, parents, values, tot_text);
+				let labels = ["CH"];
+				let parents = [""]
+				let values = [0];
+				let sum = 0;
+				let tot_text = [0];
+				let tot_sum = 0;
+				let used_date = dates[dates.length - date_index];
+				let tot_inhabitants = 0;
+
+				for (let canton = 0; canton < cantons.length; ++canton) {
+					labels.push(cantons[canton]);
+					parents.push("CH");
+
+					let val = conf_cases_diff_per100k[canton][conf_cases_diff_per100k[canton].length - date_index];
+					val = Math.round(val*10)/10;
+					values.push(val);
+					sum += val;
+
+					let tot_val = conf_cases_diff[canton][conf_cases_diff[canton].length - date_index];
+					tot_text.push("cases per 100k: " + val + "<br />total cases: " + tot_val);
+					tot_sum += tot_val;
+
+					tot_inhabitants += inhabitants[cantons[canton]];
+				}
+				values[0] = sum;
+				let tot_cases_per100k = tot_sum / tot_inhabitants * 100e3;
+				tot_cases_per100k = Math.round(tot_cases_per100k * 10) / 10;
+				tot_text[0] = "cases per 100k: " + tot_cases_per100k  + "<br />total cases: " + tot_sum + "<br />" +  used_date;
+
+
+				for (let i = 0; i < result.length; ++i) {
+					processDistrict(result[i], labels, parents, values, tot_text, used_date);
+				}
+
+				updatePlot(labels, parents, values, tot_text, 'plot' + date_index);
+			}
 		});
 	});
 }
@@ -179,7 +193,7 @@ function ISO8601_week_no(dt) {
 	return 1 + Math.ceil((firstThursday - tdt) / 604800000);
 }
 
-function updatePlot(labels, parents, values, text){
+function updatePlot(labels, parents, values, text, name){
 	var data = [{
 		"type": "sunburst",
 		"labels": labels,
@@ -195,7 +209,7 @@ function updatePlot(labels, parents, values, text){
 		"margin": {"l": 0, "r": 0, "b": 0, "t": 0},
 	};
 
-	Plotly.newPlot('plot', data, layout);
+	Plotly.newPlot(name, data, layout);
 };
 
 fetchData();
