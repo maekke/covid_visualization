@@ -93,14 +93,14 @@ function fetchData() {
 				}
 
 				let data_entry = {
-					"type": "sunburst",
-					"labels": labels,
-					"parents": parents,
-					"text": tot_text,
-					"values":  values,
-					"marker": {"line": {"width": 2}},
-					"branchvalues": "total",
-					"visible": date_index === 1,
+					type: 'sunburst',
+					labels: labels,
+					parents: parents,
+					text: tot_text,
+					values:  values,
+					marker: {line: {width: 2}},
+					branchvalues: "total",
+					visible: date_index === 1,
 				};
 				data.push(data_entry);
 				data_dates.push(dates[dates.length - date_index]);
@@ -216,8 +216,7 @@ function updatePlot(data, dates){
 		sliders: [{
 			active: (dates.length - 1),
 			steps: steps,
-		}]
-
+		}],
 	};
 
 	Plotly.newPlot('plot', data, layout);
