@@ -10,7 +10,7 @@
 
 <script>
 
-function makeplot() {
+function fetchData() {
  	Plotly.d3.csv("https://www.experimental.bfs.admin.ch/bfsstatic/dam/assets/13407769/master",
 		function(data){
 			processData(data)
@@ -19,42 +19,56 @@ function makeplot() {
 };
 	
 function processData(rows) {
-	var dates = [];
-	var covid_codes = [];
+	let dates = [];
+	let covid_codes = [];
 
-	for (var i=0; i<rows.length; i++) {
-		row = rows[i];
+	for (let i=0; i<rows.length; i++) {
+		let row = rows[i];
 		dates.push(row['date']);
 		covid_codes.push(row['entered_codes_total']);
 	}
 	makePlotly(dates, covid_codes);
 	getOpenZhCovid19Data(['ncumul_conf'], function(total_dates, total_data, data_column) {
-		total_cases_sum = sumCantonalData(total_data);
-		total_cases_inc = diffData(total_cases_sum);
+		let total_cases_sum = sumCantonalData(total_data);
+		let total_cases_inc = diffData(total_cases_sum);
 
-		daily_cases = [];
+		let daily_cases = [];
+		let ratio = [];
 
 		for (let i = 0; i < dates.length; ++i) {
 			let d_index = total_dates.indexOf(dates[i]);
 			if (d_index >= 0) {
-				daily_cases.push(total_cases_inc[d_index]);
+				let cases = total_cases_inc[d_index];
+				daily_cases.push(cases);
+				ratio.push(covid_codes[i] / cases * 100);
 			}
 		}
 
-		var plotDiv = document.getElementById("plot");
-		var trace = {
+		let plotDiv = document.getElementById("plot");
+		let trace = {
 			x: dates,
 			y: daily_cases,
 			name: 'Confirmed COVID-19 cases',
 			type: 'bar',
 		};
+		Plotly.addTraces(plotDiv, trace);
 
+		trace = {
+			x: dates,
+			y: ratio,
+			name: 'covid code per case [%]',
+			yaxis: 'y2',
+			type: 'scatter',
+			line: {
+				width: 1,
+			},
+		};
 		Plotly.addTraces(plotDiv, trace);
 	});
 }
 
 function makePlotly(dates, covid_codes){
-	var traces = [{
+	let traces = [{
 		x: dates,
 		y: covid_codes,
 		name: 'Entered covid codes',
@@ -62,14 +76,19 @@ function makePlotly(dates, covid_codes){
 	},
 	];
 
-	var layout = {
+	let layout = {
 		title: 'BAG COVID-19 SwissCovid entered covid codes',
+		yaxis2: {
+			overlaying: 'y',
+			side: 'right',
+			showgrid: false,
+		},
 	};
 
 	Plotly.newPlot('plot', traces, layout);
 };
 
-makeplot();
+fetchData();
 
 </script>
 
