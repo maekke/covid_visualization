@@ -7,20 +7,7 @@
 <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 </head>
 <body>
-<div id="plot1" style="width:100%; height:800px;"></div>
-<div id="plot2" style="width:100%; height:800px;"></div>
-<div id="plot3" style="width:100%; height:800px;"></div>
-<div id="plot4" style="width:100%; height:800px;"></div>
-<div id="plot5" style="width:100%; height:800px;"></div>
-<div id="plot6" style="width:100%; height:800px;"></div>
-<div id="plot7" style="width:100%; height:800px;"></div>
-<div id="plot8" style="width:100%; height:800px;"></div>
-<div id="plot9" style="width:100%; height:800px;"></div>
-<div id="plot10" style="width:100%; height:800px;"></div>
-<div id="plot11" style="width:100%; height:800px;"></div>
-<div id="plot12" style="width:100%; height:800px;"></div>
-<div id="plot13" style="width:100%; height:800px;"></div>
-<div id="plot14" style="width:100%; height:800px;"></div>
+<div id="plot" style="width:100%; height:800px;"></div>
 
 <script>
 
@@ -66,6 +53,9 @@ function fetchData() {
 		queue.defer(Plotly.d3.csv, 'https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv');
 		queue.awaitAll(function(err, result) {
 
+			let data = [];
+			let data_dates = [];
+
 			for (let date_index = 1; date_index <= 14; ++date_index) {
 
 				let labels = ["CH"];
@@ -102,8 +92,20 @@ function fetchData() {
 					processDistrict(result[i], labels, parents, values, tot_text, used_date);
 				}
 
-				updatePlot(labels, parents, values, tot_text, 'plot' + date_index);
+				let data_entry = {
+					"type": "sunburst",
+					"labels": labels,
+					"parents": parents,
+					"text": tot_text,
+					"values":  values,
+					"marker": {"line": {"width": 2}},
+					"branchvalues": "total",
+					"visible": date_index === 1,
+				};
+				data.push(data_entry);
+				data_dates.push(dates[dates.length - date_index]);
 			}
+			updatePlot(data, data_dates);
 		});
 	});
 }
@@ -193,23 +195,32 @@ function ISO8601_week_no(dt) {
 	return 1 + Math.ceil((firstThursday - tdt) / 604800000);
 }
 
-function updatePlot(labels, parents, values, text, name){
-	var data = [{
-		"type": "sunburst",
-		"labels": labels,
-		"parents": parents,
-		"text": text,
-		"values":  values,
-		"marker": {"line": {"width": 2}},
-		"branchvalues": "total",
-	},
-	];
+function updatePlot(data, dates){
+	let steps = [];
+	for (let i = 0; i < dates.length; ++i) {
+		let visible = [];
+		for (let j = 0; j < dates.length; ++j) {
+			visible.push(i == j);
+		}
 
-	layout = {
-		"margin": {"l": 0, "r": 0, "b": 0, "t": 0},
+		let step = {
+			label: dates[i],
+			method: 'restyle',
+			args: ['visible', visible],
+		};
+		steps.unshift(step);
+	}
+
+	let layout = {
+		margin: {l: 20, r: 20, b: 0, t: 0},
+		sliders: [{
+			active: (dates.length - 1),
+			steps: steps,
+		}]
+
 	};
 
-	Plotly.newPlot(name, data, layout);
+	Plotly.newPlot('plot', data, layout);
 };
 
 fetchData();
