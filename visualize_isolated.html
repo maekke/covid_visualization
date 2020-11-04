@@ -9,7 +9,7 @@
 
 <script>
 
-function makeplot() {
+function fetchData() {
  	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/bag_data.csv",
 		function(data){
 			processData(data)
@@ -19,48 +19,68 @@ function makeplot() {
 	
 function processData(rows) {
 
-	console.log(rows);
-	var dates = [];
-	var isolated = [];
-	var quarantined = [];
-	var quarantined_travel = [];
+	let dates = [];
+	let isolated = [];
+	let quarantined = [];
+	let quarantined_travel = [];
+	let iso_quar_ratio = [];
 
-	for (var i=0; i<rows.length; i++) {
-		row = rows[i];
+	for (let i=0; i<rows.length; i++) {
+		let row = rows[i];
 		if (row['isolated'] > 0) {
 			dates.push(row['date']);
-			isolated.push(row['isolated']);
-			quarantined.push(row['quarantined']);
+			let iso = parseInt(row['isolated']);
+			isolated.push(iso);
+			let quar = parseInt(row['quarantined']);
+			quarantined.push(quar);
 			quarantined_travel.push(row['quarantined_travel']);
+			iso_quar_ratio.push(1.0 * quar / iso);
 		}
 	}
-	console.log('dates',dates);
-	makePlotly(dates, isolated, quarantined, quarantined_travel);
+	makePlotly(dates, isolated, quarantined, quarantined_travel, iso_quar_ratio);
 }
 
-function makePlotly(dates, isolated, quarantined, quarantined_travel){
-	var traces = [{
+function makePlotly(dates, isolated, quarantined, quarantined_travel, iso_quar_ratio){
+	let traces = [{
 		x: dates,
 		y: isolated,
-		name: 'Isolated'
+		name: 'Isolated',
 	},
 	{
 		x: dates,
 		y: quarantined,
-		name: 'Quarantined'
+		name: 'Quarantined',
 	},
 	{
 		x: dates,
 		y: quarantined_travel,
-		name: 'Quarantined travel'
+		name: 'Quarantined travel',
+	},
+	{
+		x: dates,
+		y: iso_quar_ratio,
+		yaxis: 'y2',
+		name: 'Quarantined / Isolated ratio',
+		line: {
+			width: 1,
+		},
+		visible: 'legendonly',
 	},
 	];
 
-	Plotly.newPlot('isolated', traces, 
-		{title: 'BAG COVID-19 isolation / quarantined cases'});
+	let layout = {
+		title: 'BAG COVID-19 isolation / quarantined cases',
+                yaxis2: {
+                        overlaying: 'y',
+                        side: 'right',
+                        showgrid: false,
+                },
+	};
+
+	Plotly.newPlot('isolated', traces, layout);
 };
 
-makeplot();
+fetchData();
 
 </script>
 
