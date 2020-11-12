@@ -13,6 +13,8 @@
 
 [Weekly performed PCR tests per canton from BAG](https://maekke.github.io/visualize_tests_per_canton.html)
 
+[Performed tests by canton from OpenZH covid19 repo](https://maekke.github.io/visualize_tests_per_canton_openzh.html)
+
 ## Covid data overview of Switzerland
 [CH covid data overview](https://maekke.github.io/visualize_ch.html)
 

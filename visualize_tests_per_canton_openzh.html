@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot_AG" style="width:100%; height:600px;"></div>
+<div id="plot_BE" style="width:100%; height:600px;"></div>
+<div id="plot_BS" style="width:100%; height:600px;"></div>
+<div id="plot_FR" style="width:100%; height:600px;"></div>
+<div id="plot_SG" style="width:100%; height:600px;"></div>
+<div id="plot_SO" style="width:100%; height:600px;"></div>
+<div id="plot_ZH" style="width:100%; height:600px;"></div>
+
+<script>
+
+function fetchData(canton, use_week) {
+	Plotly.d3.csv("https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_tests/fallzahlen_kanton_" + canton + "_tests.csv",
+		function(data){
+			processData(data, canton, use_week)
+		}
+	);
+};
+
+function processData(rows, canton, use_week) {
+	let dates = [];
+	let pos_tests = [];
+	let neg_tests = [];
+	let tot_tests = [];
+	let pos_rate = [];
+
+	let has_pos_tests = true;
+	let has_neg_tests = true;
+	let has_tot_tests = true;
+	let has_pos_rate = true;
+
+	for (let i = 0; i < rows.length; ++i) {
+		let row = rows[i];
+		if (use_week) {
+			dates.push(row['week']);
+		}
+		else {
+			dates.push(row['start_date']);
+		}
+		pos_tests.push(row['positive_tests']);
+		neg_tests.push(row['negative_tests']);
+		tot_tests.push(row['total_tests']);
+		pos_rate.push(row['positivity_rate']);
+
+		has_pos_tests = has_pos_tests && row['positive_tests'] != '';
+		has_neg_tests = has_neg_tests && row['negative_tests'] != '';
+		has_tot_tests = has_tot_tests && row['total_tests'] != '';
+		has_pos_rate = has_pos_rate && row['positivity_rate'] != '';
+	}
+
+	// try to calculate / approximate missing values...
+	if (has_tot_tests && !has_neg_tests && !has_pos_tests && has_pos_rate) {
+		for (let i = 0; i < rows.length; ++i) {
+			const tot = parseInt(tot_tests[i]);
+			const pos_r = parseFloat(pos_rate[i]);
+			pos_tests[i] = Math.round(tot * pos_r / 100);
+			neg_tests[i] = tot - pos_tests[i];
+		}
+		has_neg_tests = true;
+		has_pos_tests = true;
+
+	}
+	else if (!has_neg_tests && has_pos_tests && has_tot_tests) {
+		for (let i = 0; i < rows.length; ++i) {
+			neg_tests[i] = parseInt(tot_tests[i]) - parseInt(pos_tests[i]);
+		}
+		has_neg_tests = true;
+	}
+
+	if (!has_pos_rate && has_pos_tests && has_neg_tests && has_tot_tests) {
+		for (let i = 0; i < rows.length; ++i) {
+			pos_rate[i] = 100.0 * parseInt(pos_tests[i]) / parseInt(tot_tests[i]);
+		}
+		has_pos_rate = true;
+	}
+
+	let pos_visibility = has_pos_tests ? true : false;
+	let neg_visibility = has_neg_tests ? true : false;
+	let tot_visibility = has_tot_tests ? true : false;
+	let pos_rate_visibility = has_pos_rate ? true : false;
+
+	if (pos_visibility && neg_visibility && tot_visibility) {
+		tot_visibility = false;
+	}
+
+	traces = [{
+		x: dates,
+		y: pos_tests,
+		name: 'Positive tests',
+		type: 'bar',
+		visible: pos_visibility,
+		barmode: 'stack',
+	},
+	{
+		x: dates,
+		y: neg_tests,
+		name: 'Negative tests',
+		type: 'bar',
+		visible: neg_visibility,
+		barmode: 'stack',
+	},
+	{
+		x: dates,
+		y: pos_rate,
+		name: 'Positivity rate [%]',
+		yaxis: 'y2',
+		type: 'scatter',
+		line: {
+			width: 1,
+		},
+		visible: pos_rate_visibility,
+	},
+	];
+	initPlotly(canton, traces);
+}
+
+function initPlotly(canton, traces){
+	let layout = {
+		title: 'Test data for canton ' + canton,
+		barmode: 'stack',
+		yaxis2: {
+			overlaying: 'y',
+			side: 'right',
+			showgrid: false,
+		},
+	};
+
+	Plotly.newPlot('plot_' + canton, traces, layout);
+};
+
+fetchData('AG', true);
+fetchData('BE', true);
+fetchData('BS', false);
+fetchData('FR', true);
+fetchData('SG', false);
+fetchData('SO', true);
+fetchData('ZH', true);
+
+</script>
+
+</body>
+</html>
