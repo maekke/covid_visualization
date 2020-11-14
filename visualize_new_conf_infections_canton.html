@@ -47,8 +47,8 @@ function processData(rows) {
 		}
 
 		// keep a clone of the data for a subset
-		let dates_from_june = dates.slice();
-		let conf_cases_diff_from_june = clone_data(conf_cases_diff);
+		let dates_subset = dates.slice();
+		let conf_cases_diff_subset = clone_data(conf_cases_diff);
 
 		// average the full set and plot it
 		average_canton_data(dates, cantons, conf_cases_diff, 7);
@@ -56,22 +56,20 @@ function processData(rows) {
 		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
 		updatePlot(dates, cantons, conf_cases_diff_per100k, conf_cases_diff, 'overview');
 
-		// create a second plot from beginning of june
-		let index = dates_from_june.indexOf('2020-06-01')
-		if (index === -1) {
-			console.log('could not find 2020-06-01 entry!')
-			return;
-		}
-		// and remove everything before 2020-06-01.
+		// create a second plot with the last weeks
+		let index = dates_subset.length - 12 * 7;
+		// and remove everything before the given index/date.
 		for (let canton = 0; canton < cantons.length; ++canton) {
-			conf_cases_diff_from_june[canton].splice(0, index);
+			conf_cases_diff_subset[canton].splice(0, index);
 		}
-		dates_from_june.splice(0, index);
+		dates_subset.splice(0, index);
+		console.log(dates_subset);
+		console.log(dates_subset.length);
 		// and average / output it.
-		average_canton_data(dates_from_june, cantons, conf_cases_diff_from_june, 7);
-		let conf_cases_diff_from_june_per100k = clone_data(conf_cases_diff_from_june);
-		scale_inhabitants(dates_from_june, cantons, conf_cases_diff_from_june_per100k , inhabitants);
-		updatePlot(dates_from_june, cantons, conf_cases_diff_from_june_per100k, conf_cases_diff_from_june, 'reduced');
+		average_canton_data(dates_subset, cantons, conf_cases_diff_subset, 7);
+		let conf_cases_diff_subset_per100k = clone_data(conf_cases_diff_subset);
+		scale_inhabitants(dates_subset, cantons, conf_cases_diff_subset_per100k , inhabitants);
+		updatePlot(dates_subset, cantons, conf_cases_diff_subset_per100k, conf_cases_diff_subset, 'reduced');
 	});
 }
 
