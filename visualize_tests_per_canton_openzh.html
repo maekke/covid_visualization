@@ -32,10 +32,10 @@ function processData(rows, canton, use_week) {
 	let tot_tests = [];
 	let pos_rate = [];
 
-	let has_pos_tests = true;
-	let has_neg_tests = true;
-	let has_tot_tests = true;
-	let has_pos_rate = true;
+	let has_pos_tests = false;
+	let has_neg_tests = false;
+	let has_tot_tests = false;
+	let has_pos_rate = false;
 
 	for (let i = 0; i < rows.length; ++i) {
 		let row = rows[i];
@@ -50,10 +50,10 @@ function processData(rows, canton, use_week) {
 		tot_tests.push(row['total_tests']);
 		pos_rate.push(row['positivity_rate']);
 
-		has_pos_tests = has_pos_tests && row['positive_tests'] != '';
-		has_neg_tests = has_neg_tests && row['negative_tests'] != '';
-		has_tot_tests = has_tot_tests && row['total_tests'] != '';
-		has_pos_rate = has_pos_rate && row['positivity_rate'] != '';
+		has_pos_tests |= row['positive_tests'] != '';
+		has_neg_tests |= row['negative_tests'] != '';
+		has_tot_tests |= row['total_tests'] != '';
+		has_pos_rate |= row['positivity_rate'] != '';
 	}
 
 	// try to calculate / approximate missing values...
