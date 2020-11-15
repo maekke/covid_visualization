@@ -6,28 +6,22 @@
 <script src="openzh_covid19.js"></script>
 </head>
 <body>
-<div id="plot" style="width:100%; height:600px;"></div>
-<select id="canton-selector" />
 
 <script>
 
-var canton = "ZH";
-const dataColumns = ['ncumul_conf', 'ncumul_deceased', 'current_hosp', 'current_isolated', 'current_quarantined'];
-
-function addTrace(trace) {
-	let plotDiv = document.getElementById("plot");
-	Plotly.addTraces(plotDiv, trace);
+function fetchData() {
+	const cantons = getCantons();
+	for (let i = 0; i < cantons.length; ++i) {
+		const canton = cantons[i];
+		Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/daten_pro_kanton/bag_data_" + canton + ".csv",
+			function(data){
+				processData(data, canton)
+			}
+		);
+	}
 }
 
-function makeplot() {
- 	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/bag_data/master/daten_pro_kanton/bag_data_" + canton + ".csv",
-		function(data){
-			processData(data)
-		}
-	);
-}
-
-function processData(rows) {
+function processData(rows, canton) {
 	let weeks = [];
 	let total_pcr_tests = [];
 	let positivity_rate = [];
@@ -45,6 +39,7 @@ function processData(rows) {
 		x: weeks,
 		y: total_pcr_tests,
 		name: 'PCR tests ' + canton,
+		type: 'bar',
 	},
 	{
 		x: weeks,
@@ -54,45 +49,38 @@ function processData(rows) {
 	},
 	];
 
-	addTrace(traces);
+	let div = document.getElementById(canton);
+	Plotly.addTraces(div, traces);
 }
 
-function makePlotly(){
-	let cantons = getCantons();
-	var cantonSelector = document.getElementById("canton-selector");
+function setupHtml(){
+	const cantons = getCantons();
+
 	for (let i = 0; i < cantons.length; ++i) {
-		var option = document.createElement('option');
-		option.text = cantons[i];
-		cantonSelector.appendChild(option);
+		const canton = cantons[i];
+
+		let div = document.createElement('div');
+		div.id = canton;
+		div.style = 'width:100%; height:600px;';
+		document.body.appendChild(div);
+
+		let traces = [];
+		let layout = {
+			title: 'PCR test ' + canton,
+			yaxis2: {
+				title: 'Positivity rate %',
+				overlaying: 'y',
+				side: 'right',
+				showgrid: false,
+			},
+		};
+
+		Plotly.newPlot(canton, traces, layout);
 	}
-	cantonSelector.value = canton;
-
-	cantonSelector.addEventListener('change', function() {
-		let plotDiv = document.getElementById("plot");
-		for (let i = 0; i < 2; ++i) {
-			Plotly.deleteTraces(plotDiv, 0);
-		}
-		canton = cantonSelector.value;
-		makeplot();
-	}, false);
-
-	var traces = [];
-
-	var layout = {
-		title: 'PCR test - cantonal data',
-		yaxis2: {
-			title: 'Positivity rate %',
-			overlaying: 'y',
-			side: 'right',
-			showgrid: false,
-		},
-	};
-
-	Plotly.newPlot('plot', traces, layout);
 }
 
-makePlotly();
-makeplot();
+setupHtml();
+fetchData();
 
 </script>
 
