@@ -18,11 +18,13 @@
 <div id="plot_TI" style="width:100%; height:600px;"></div>
 <div id="plot_VS" style="width:100%; height:600px;"></div>
 <div id="plot_ZH" style="width:100%; height:600px;"></div>
+<div id="plot_FL" style="width:100%; height:600px;"></div>
 
 <script>
 
 function fetchData(canton, use_week) {
-	Plotly.d3.csv("https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_tests/fallzahlen_kanton_" + canton + "_tests.csv",
+	let prefix = canton == "FL" ? "" : "kanton_";
+	Plotly.d3.csv("https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_tests/fallzahlen_" + prefix + canton + "_tests.csv",
 		function(data){
 			processData(data, canton, use_week)
 		}
@@ -128,7 +130,7 @@ function processData(rows, canton, use_week) {
 
 function initPlotly(canton, traces){
 	let layout = {
-		title: 'Test data for canton ' + canton,
+		title: 'Test data for ' + canton,
 		barmode: 'stack',
 		yaxis2: {
 			overlaying: 'y',
@@ -152,6 +154,7 @@ fetchData('SO', true);
 fetchData('TI', false);
 fetchData('VS', true);
 fetchData('ZH', true);
+fetchData('FL', true);
 
 </script>
 
