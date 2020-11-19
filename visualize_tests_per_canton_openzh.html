@@ -80,6 +80,12 @@ function processData(rows, canton, use_week) {
 		}
 		has_neg_tests = true;
 	}
+	else if (has_neg_tests && has_pos_tests && !has_tot_tests) {
+		for (let i = 0; i < rows.length; ++i) {
+			tot_tests[i] = parseInt(neg_tests[i]) + parseInt(pos_tests[i]);
+		}
+		has_tot_tests = true;
+	}
 
 	if (!has_pos_rate && has_pos_tests && has_neg_tests && has_tot_tests) {
 		for (let i = 0; i < rows.length; ++i) {
