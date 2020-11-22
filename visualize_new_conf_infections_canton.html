@@ -8,6 +8,7 @@
 <body>
 <div id="reduced" style="width:100%; height:800px;"></div>
 <div id="overview" style="width:100%; height:800px;"></div>
+<div id="change" style="width:100%; height:800px;"></div>
 
 <script>
 
@@ -54,7 +55,7 @@ function processData(rows) {
 		average_canton_data(dates, cantons, conf_cases_diff, 7);
 		let conf_cases_diff_per100k = clone_data(conf_cases_diff);
 		scale_inhabitants(dates, cantons, conf_cases_diff_per100k, inhabitants);
-		updatePlot(dates, cantons, conf_cases_diff_per100k, conf_cases_diff, 'overview');
+		updatePlot(dates, cantons, conf_cases_diff_per100k, conf_cases_diff, 'overview', 'Cantonal new confirmed cases over time');
 
 		// create a second plot with the last weeks
 		let index = dates_subset.length - 12 * 7;
@@ -63,13 +64,25 @@ function processData(rows) {
 			conf_cases_diff_subset[canton].splice(0, index);
 		}
 		dates_subset.splice(0, index);
-		console.log(dates_subset);
-		console.log(dates_subset.length);
 		// and average / output it.
 		average_canton_data(dates_subset, cantons, conf_cases_diff_subset, 7);
 		let conf_cases_diff_subset_per100k = clone_data(conf_cases_diff_subset);
 		scale_inhabitants(dates_subset, cantons, conf_cases_diff_subset_per100k , inhabitants);
-		updatePlot(dates_subset, cantons, conf_cases_diff_subset_per100k, conf_cases_diff_subset, 'reduced');
+		updatePlot(dates_subset, cantons, conf_cases_diff_subset_per100k, conf_cases_diff_subset, 'reduced', 'Cantonal new confirmed cases last three month');
+
+		// create the diff of the diff...
+		let conf_cases_diff_subset_per100k_diff = clone_data(conf_cases_diff_subset_per100k);
+		let conf_cases_diff_subset_diff = clone_data(conf_cases_diff_subset);
+		for (let canton = 0; canton < cantons.length; ++canton) {
+			for (let i = 1; i < dates_subset.length; ++i) {
+				conf_cases_diff_subset_per100k_diff[canton][i] = conf_cases_diff_subset_per100k[canton][i] - conf_cases_diff_subset_per100k[canton][i - 1];
+				conf_cases_diff_subset_diff [canton][i] = conf_cases_diff_subset[canton][i] - conf_cases_diff_subset[canton][i - 1];
+			}
+			conf_cases_diff_subset_per100k_diff[canton][0] = 0;
+			conf_cases_diff_subset_diff [canton][0] = 0;
+		}
+		let dates_subset_diff = dates_subset.slice();
+		updatePlot(dates_subset_diff, cantons, conf_cases_diff_subset_per100k_diff, conf_cases_diff_subset_diff, 'change', 'Change of new confirmed cases per canton');
 	});
 }
 
@@ -115,7 +128,7 @@ function scale_inhabitants(dates, cantons, conf_cases_diff, inhabitants) {
 	}
 }
 
-function updatePlot(dates, districts, new_conf_cases_avg, new_conf_cases, id){
+function updatePlot(dates, districts, new_conf_cases_avg, new_conf_cases, id, title){
 	var data = [{
 		type: 'heatmap',
 		x: dates,
@@ -129,7 +142,7 @@ function updatePlot(dates, districts, new_conf_cases_avg, new_conf_cases, id){
 	];
 
 	layout = {
-		title: 'Cantonal new confirmed cases over time',
+		title: title,
 		yaxis: {
 			fixedrange: true,
 		},
