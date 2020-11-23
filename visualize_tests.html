@@ -21,25 +21,36 @@ function fetchData() {
 function processData(rows) {
 	let dates = [];
 	let total_pcr_tests = [];
-	let positivity_rate = [];
+	let pcr_positivity_rate = [];
+	let total_antigen_tests = [];
+	let antigen_positivity_rate = [];
 
 	for (let i = 0; i < rows.length; ++i) {
 		row = rows[i];
 		if (row['total_number_of_tests'] > 0) {
 			dates.push(row['date']);
 			total_pcr_tests.push(row['total_number_of_tests']);
-			positivity_rate.push(row['positivity_rate_percent']);
+			pcr_positivity_rate.push(row['positivity_rate_percent']);
+			let val = row['total_number_of_antigen_tests'];
+			total_antigen_tests.push(val !== '' ? val : NaN);
+			val = row['positivity_rate_antigen_tests'];
+			antigen_positivity_rate.push(val !== '' ? val : NaN);
 		}
 	}
 
 	let total_pcr_tests_inc = [];
 	total_pcr_tests_inc.push(0);
+	let total_antigen_tests_inc = [];
+	total_antigen_tests_inc.push(0);
 	for (let i = 1; i < total_pcr_tests.length; ++i) {
 		total_pcr_tests_inc.push(total_pcr_tests[i] - total_pcr_tests[i - 1])
+		total_antigen_tests_inc.push(total_antigen_tests[i] - total_antigen_tests[i - 1])
 	}
 	total_pcr_tests_inc[0] = total_pcr_tests_inc[1];
+	total_antigen_tests_inc[0] = total_antigen_tests_inc[1];
 
 	let total_pcr_tests_inc_avg = average(total_pcr_tests_inc, 7);
+	let total_antigen_tests_inc_avg = average(total_antigen_tests_inc, 7);
 
 	let traces = [{
 		x: dates,
@@ -48,16 +59,39 @@ function processData(rows) {
 	},
 	{
 		x: dates,
+		y: total_antigen_tests_inc,
+		name: 'Antigen tests',
+	},
+	{
+		x: dates,
 		y: total_pcr_tests_inc_avg,
 		name: 'PCR tests average',
 		line: {
 			dash: 'dash',
+			width: 1.0,
 		},
+		visible: 'legendonly',
 	},
 	{
 		x: dates,
-		y: positivity_rate,
-		name: 'Positivity rate',
+		y: total_antigen_tests_inc_avg,
+		name: 'Antigen tests average',
+		line: {
+			dash: 'dash',
+			width: 1.0,
+		},
+		visible: 'legendonly',
+	},
+	{
+		x: dates,
+		y: pcr_positivity_rate,
+		name: 'PCR positivity rate',
+		yaxis: 'y2',
+	},
+	{
+		x: dates,
+		y: antigen_positivity_rate,
+		name: 'Antigen positivity rate',
 		yaxis: 'y2',
 	},
 	];
