@@ -12,6 +12,7 @@
 
 function fetchData() {
 	getOpenZhCovid19Data(['ncumul_conf'], function(dates, data, data_column) {
+		data = fillUnavailableValues(data);
 		let data_sum = sumCantonalData(data);
 		let data_sum_inc = diffData(data_sum);
 

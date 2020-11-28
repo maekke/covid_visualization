@@ -16,6 +16,7 @@ function fetchData() {
 	const inhabitants = getCantonInhabitants();
 
 	getOpenZhCovid19Data(['ncumul_conf'], function(dates, data, data_column_name) {
+		data = fillUnavailableValues(data);
 		// switch array index
 		let total_conf_cases = [];
 		total_conf_cases.size = cantons.length;

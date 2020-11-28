@@ -29,6 +29,7 @@ function processData(rows) {
 	}
 	makePlotly(dates, covid_codes);
 	getOpenZhCovid19Data(['ncumul_conf'], function(total_dates, total_data, data_column) {
+		total_data = fillUnavailableValues(total_data);
 		let total_cases_sum = sumCantonalData(total_data);
 		let total_cases_inc = diffData(total_cases_sum);
 
