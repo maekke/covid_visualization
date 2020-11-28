@@ -40,10 +40,18 @@ function processData(rows) {
 		let conf_cases_diff = [];
 		conf_cases_diff.size = total_conf_cases.size;
 		for (let canton = 0; canton < cantons.length; ++canton) {
-			conf_cases_diff[canton] = [0];
+			conf_cases_diff[canton] = [NaN];
 			conf_cases_diff[canton].size = total_conf_cases[canton].size;
+			let last_value = total_conf_cases[canton][0];
+			last_value = isNaN(last_value) ? 0 : last_value;
 			for (let i = 1; i < dates.length; ++i) {
-				conf_cases_diff[canton][i] = total_conf_cases[canton][i] - total_conf_cases[canton][i - 1]
+				if (!isNaN(total_conf_cases[canton][i])) {
+					conf_cases_diff[canton][i] = total_conf_cases[canton][i] - last_value;
+					last_value = total_conf_cases[canton][i];
+				}
+				else {
+					conf_cases_diff[canton][i] = NaN;
+				}
 			}
 		}
 
@@ -65,7 +73,6 @@ function processData(rows) {
 		}
 		dates_subset.splice(0, index);
 		// and average / output it.
-		average_canton_data(dates_subset, cantons, conf_cases_diff_subset, 7);
 		let conf_cases_diff_subset_per100k = clone_data(conf_cases_diff_subset);
 		scale_inhabitants(dates_subset, cantons, conf_cases_diff_subset_per100k , inhabitants);
 		updatePlot(dates_subset, cantons, conf_cases_diff_subset_per100k, conf_cases_diff_subset, 'reduced', 'Cantonal new confirmed cases last three month');
@@ -74,9 +81,21 @@ function processData(rows) {
 		let conf_cases_diff_subset_per100k_diff = clone_data(conf_cases_diff_subset_per100k);
 		let conf_cases_diff_subset_diff = clone_data(conf_cases_diff_subset);
 		for (let canton = 0; canton < cantons.length; ++canton) {
+			let last_value_100k = conf_cases_diff_subset_per100k[canton][0];
+			last_value_100k = isNaN(last_value_100k) ? 0 : last_value_100k;
+			let last_value = conf_cases_diff_subset[canton][0];
+			last_value = isNaN(last_value) ? 0 : last_value;
 			for (let i = 1; i < dates_subset.length; ++i) {
-				conf_cases_diff_subset_per100k_diff[canton][i] = conf_cases_diff_subset_per100k[canton][i] - conf_cases_diff_subset_per100k[canton][i - 1];
-				conf_cases_diff_subset_diff [canton][i] = conf_cases_diff_subset[canton][i] - conf_cases_diff_subset[canton][i - 1];
+				if (!isNaN(conf_cases_diff_subset_per100k[canton][i])) {
+					conf_cases_diff_subset_per100k_diff[canton][i] = conf_cases_diff_subset_per100k[canton][i] - last_value_100k;
+					conf_cases_diff_subset_diff [canton][i] = conf_cases_diff_subset[canton][i] - last_value;
+					last_value_100k = conf_cases_diff_subset_per100k[canton][i]
+					last_value = conf_cases_diff_subset[canton][i];
+				}
+				else {
+					conf_cases_diff_subset_per100k_diff[canton][i] = NaN;
+					conf_cases_diff_subset_diff [canton][i] = NaN;
+				}
 			}
 			conf_cases_diff_subset_per100k_diff[canton][0] = 0;
 			conf_cases_diff_subset_diff [canton][0] = 0;
@@ -102,9 +121,14 @@ function clone_data(conf_cases) {
 function average_canton_data(dates, cantons, conf_cases_diff, avg_days) {
 	for (let i = 0; i < dates.length; ++i) {
 		for (let canton = 0; canton < cantons.length; ++canton) {
-			let sum = 0;
+			let sum = NaN;
 			for (let day = 0; day < avg_days && i + day < conf_cases_diff[canton].length; ++day) {
-				sum += conf_cases_diff[canton][i + day];
+				if (!isNaN(conf_cases_diff[canton][i + day])) {
+					if (isNaN(sum)) {
+						sum = 0;
+					}
+					sum += conf_cases_diff[canton][i + day];
+				}
 			}
 			conf_cases_diff[canton][i] = sum;
 			let limit = Math.min(avg_days, conf_cases_diff[canton].length - i);
