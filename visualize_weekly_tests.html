@@ -19,15 +19,25 @@ function makeplot() {
 };
 	
 function processData(rows) {
-	var weeks = [];
-	var total_pcr_tests = [];
-	var positivity_rate = [];
+	let weeks = [];
+	let total_tests = [];
+	let total_pcr_tests = [];
+	let pcr_positivity_rate = [];
+	let total_antigen_tests = [];
+	let antigen_positivity_rate = [];
 
 	for (let i = 0; i < rows.length; ++i) {
 		row = rows[i];
 		weeks.push(row['week']);
-		total_pcr_tests.push(row['total_number_of_tests']);
-		positivity_rate.push(row['positivity_rate_percent']);
+		total_pcr_tests.push(row['total_number_of_pcr_tests']);
+		pcr_positivity_rate.push(row['positivity_rate_pcr_percent']);
+		total_antigen_tests.push(row['total_number_of_antigen_tests']);
+		antigen_positivity_rate.push(row['positivity_rate_antigen_percent']);
+		let total = parseInt(row['total_number_of_pcr_tests']);
+		if (row['total_number_of_antigen_tests']) {
+			total += parseInt(row['total_number_of_antigen_tests']);
+		}
+		total_tests.push(total);
 	}
 
 	var traces = [{
@@ -37,9 +47,25 @@ function processData(rows) {
 	},
 	{
 		x: weeks,
-		y: positivity_rate,
-		name: 'Positivity rate',
+		y: pcr_positivity_rate,
+		name: 'Positivity rate PCR',
 		yaxis: 'y2',
+	},
+	{
+		x: weeks,
+		y: total_antigen_tests,
+		name: 'weekly antigen tests',
+	},
+	{
+		x: weeks,
+		y: antigen_positivity_rate,
+		name: 'Positivity rate antigen',
+		yaxis: 'y2',
+	},
+	{
+		x: weeks,
+		y: total_tests,
+		name: 'weekly total tests',
 	},
 	];
 
@@ -49,7 +75,7 @@ function processData(rows) {
 
 function makePlotly(traces){
 	var layout = {
-		title: 'Weekly performed PCR tests',
+		title: 'Weekly performed PCR and antigen tests',
 		yaxis2: {
 			title: 'Positivity rate %',
 			overlaying: 'y',
