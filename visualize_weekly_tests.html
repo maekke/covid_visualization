@@ -50,6 +50,10 @@ function processData(rows) {
 		y: pcr_positivity_rate,
 		name: 'Positivity rate PCR',
 		yaxis: 'y2',
+		line: {
+			width: 1,
+			dash: 'dot',
+		},
 	},
 	{
 		x: weeks,
@@ -61,11 +65,18 @@ function processData(rows) {
 		y: antigen_positivity_rate,
 		name: 'Positivity rate antigen',
 		yaxis: 'y2',
+		line: {
+			width: 1,
+			dash: 'dot',
+		},
 	},
 	{
 		x: weeks,
 		y: total_tests,
 		name: 'weekly total tests',
+		line: {
+			width: 1,
+		},
 	},
 	];
 
