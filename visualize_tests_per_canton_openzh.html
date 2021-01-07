@@ -57,9 +57,15 @@ function processData(rows, canton, use_week, id) {
 	for (let i = 0; i < rows.length; ++i) {
 		let row = rows[i];
 		if (use_week) {
+			if (row['week'] === '') {
+				continue;
+			}
 			dates.push(row['week']);
 		}
 		else {
+			if (row['start_date'] === '') {
+				continue;
+			}
 			dates.push(row['start_date']);
 		}
 		pos_tests.push(row['positive_tests']);
