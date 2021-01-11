@@ -60,7 +60,12 @@ function processData(rows, canton, use_week, id) {
 			if (row['week'] === '') {
 				continue;
 			}
-			dates.push(row['week']);
+			if (row['year'] === '') {
+				dates.push(row['week']);
+			}
+			else {
+				dates.push(row['week'] + ' (' + row['year'] + ')');
+			}
 		}
 		else {
 			if (row['start_date'] === '') {
