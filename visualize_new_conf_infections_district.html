@@ -31,8 +31,15 @@ function processData(rows, canton, useDate) {
 
 	for (let i = 0; i < rows.length; i++) {
 		row = rows[i];
-		let week = useDate ? row['Date'] : row['Week'];
-		if (week !== "") {
+		let week = row['Date'];
+		if (!useDate) {
+			week = row['Year'] + '/';
+			if (parseInt(row['Week']) < 10) {
+				week += '0';
+			}
+			week += row['Week']
+		}
+		if (week !== "" && week !== '/') {
 			let week_index = weeks.indexOf(week);
 			if (week_index === -1) {
 				week_index = weeks.length;
@@ -47,9 +54,7 @@ function processData(rows, canton, useDate) {
 			}
 		}
 	}
-	weeks.sort(function (a, b) {
-		return parseInt(a) - parseInt(b);
-	});
+	weeks.sort();
 
 	let new_conf_cases = [];
 	let new_conf_cases_per100k = [];
@@ -57,8 +62,15 @@ function processData(rows, canton, useDate) {
 	new_conf_cases_per100k.length = districts.length;
 	for (let i = 0; i < rows.length; i++) {
 		row = rows[i];
-		let week = useDate ? row['Date'] : row['Week'];
-		if (week !== "") {
+		let week = row['Date'];
+		if (!useDate) {
+			week = row['Year'] + '/';
+			if (parseInt(row['Week']) < 10) {
+				week += '0';
+			}
+			week += row['Week']
+		}
+		if (week !== "" && week !== '/') {
 			let week_index = weeks.indexOf(week);
 
 			let district = row['District'];
