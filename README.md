@@ -34,3 +34,6 @@
 [New confirmed infections per district over time](https://maekke.github.io/visualize_new_conf_infections_district.html)
 
 [New confirmed infections per canton over time](https://maekke.github.io/visualize_new_conf_infections_canton.html)
+
+## Vaccination data
+[Vaccination data per cantons](https://maekke.github.io/visualize_vaccinations.html)
