@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot_AG" style="width:100%; height:600px;"></div>
+<div id="plot_AI" style="width:100%; height:600px;"></div>
+<div id="plot_AR" style="width:100%; height:600px;"></div>
+<div id="plot_BE" style="width:100%; height:600px;"></div>
+<div id="plot_BL" style="width:100%; height:600px;"></div>
+<div id="plot_BS" style="width:100%; height:600px;"></div>
+<div id="plot_GE" style="width:100%; height:600px;"></div>
+<div id="plot_NW" style="width:100%; height:600px;"></div>
+<div id="plot_SO" style="width:100%; height:600px;"></div>
+<div id="plot_TG" style="width:100%; height:600px;"></div>
+<div id="plot_VD" style="width:100%; height:600px;"></div>
+<div id="plot_ZG" style="width:100%; height:600px;"></div>
+
+<script>
+
+function fetchData(canton, use_week) {
+	fetchDataWithId(canton, use_week, canton);
+};
+
+function fetchDataWithId(canton, use_week, id) {
+	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/vaccination_data/master/vaccination_data_" + canton.toLowerCase() + ".csv",
+		function(data){
+			processData(data, canton, use_week, id)
+		}
+	);
+};
+
+function processData(rows, canton, use_week, id) {
+	let dates = [];
+	let first_doses = [];
+	let second_doses = [];
+	let total_vaccinations = [];
+	let doses_delivered = [];
+
+	let has_first_doses = true;
+	let has_second_doses = true;
+	let has_total_vaccinations = true;
+	let has_doses_delivered = true;
+
+	for (let i = 0; i < rows.length; ++i) {
+		let row = rows[i];
+		if (use_week) {
+			if (row['week'] === '') {
+				continue;
+			}
+			if (row['year'] === '') {
+				dates.push(row['week']);
+			}
+			else {
+				dates.push(row['week'] + ' (' + row['year'] + ')');
+			}
+		}
+		else {
+			if (row['date'] === '') {
+				continue;
+			}
+			dates.push(row['date']);
+		}
+		first_doses.push(row['first_doses']);
+		second_doses.push(row['second_doses']);
+		total_vaccinations.push(row['total_vaccinations']);
+		doses_delivered.push(row['doses_delivered']);
+
+		has_first_doses &= row['first_doses'] !== '';
+		has_second_doses &= row['second_doses'] !== '';
+		has_total_vaccinations &= row['total_vaccinations'] !== '';
+		has_doses_delivered &= row['doses_delivered'] !== '';
+	}
+
+	let first_doses_diff = diffData(first_doses);
+	let second_doses_diff = diffData(second_doses);
+	let total_vaccinations_diff = diffData(total_vaccinations);
+	let doses_delivered_diff = diffData(doses_delivered);
+
+	let first_doses_visibility = has_first_doses ? true : false;
+	let second_doses_visibility = has_second_doses ? true : false;
+	let total_vaccinations_visibility = has_total_vaccinations ? true : false;
+	let doses_delivered_visibility = has_doses_delivered ? true : false;
+
+	if (has_first_doses && has_second_doses) {
+		total_vaccinations_visibility = false;
+	}
+
+	traces = [{
+		x: dates,
+		y: first_doses_diff,
+		name: 'First doses',
+		type: 'bar',
+		visible: first_doses_visibility,
+		barmode: 'stack',
+		text: first_doses,
+	},
+	{
+		x: dates,
+		y: second_doses_diff,
+		name: 'Second doses',
+		type: 'bar',
+		visible: second_doses_visibility,
+		barmode: 'stack',
+		text: second_doses,
+	},
+	{
+		x: dates,
+		y: total_vaccinations_diff,
+		name: 'Total vaccinations',
+		type: 'bar',
+		visible: total_vaccinations_visibility,
+		text: total_vaccinations,
+	},
+	{
+		x: dates,
+		y: doses_delivered_diff,
+		name: 'Doses delivered',
+		type: 'scatter',
+		visible: doses_delivered_visibility,
+		text: doses_delivered,
+	},
+	];
+	initPlotly(canton, traces, id);
+}
+
+function initPlotly(canton, traces, id){
+	let layout = {
+		title: 'Vaccination data for ' + canton,
+		barmode: 'stack',
+	};
+
+	Plotly.newPlot('plot_' + id, traces, layout);
+};
+
+fetchData('AG', false);
+fetchData('AI', false);
+fetchData('AR', false);
+fetchData('BE', false);
+fetchData('BL', false);
+fetchData('BS', false);
+fetchData('GE', true);
+fetchData('NW', false);
+fetchData('SO', false);
+fetchData('TG', false);
+fetchData('VD', false);
+fetchData('ZG', false);
+
+</script>
+
+</body>
+</html>
