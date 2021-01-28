@@ -40,10 +40,10 @@ function processData(rows, canton, use_week, id) {
 	let total_vaccinations = [];
 	let doses_delivered = [];
 
-	let has_first_doses = true;
-	let has_second_doses = true;
-	let has_total_vaccinations = true;
-	let has_doses_delivered = true;
+	let has_first_doses = false;
+	let has_second_doses = false;
+	let has_total_vaccinations = false;
+	let has_doses_delivered = false;
 
 	for (let i = 0; i < rows.length; ++i) {
 		let row = rows[i];
@@ -69,10 +69,10 @@ function processData(rows, canton, use_week, id) {
 		total_vaccinations.push(row['total_vaccinations']);
 		doses_delivered.push(row['doses_delivered']);
 
-		has_first_doses &= row['first_doses'] !== '';
-		has_second_doses &= row['second_doses'] !== '';
-		has_total_vaccinations &= row['total_vaccinations'] !== '';
-		has_doses_delivered &= row['doses_delivered'] !== '';
+		has_first_doses |= row['first_doses'] !== '';
+		has_second_doses |= row['second_doses'] !== '';
+		has_total_vaccinations |= row['total_vaccinations'] !== '';
+		has_doses_delivered |= row['doses_delivered'] !== '';
 	}
 
 	let first_doses_diff = diffData(first_doses);
