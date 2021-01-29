@@ -27,19 +27,44 @@
 
 <script>
 
-function fetchData(canton, use_week) {
-	fetchDataWithId(canton, use_week, canton);
-};
-
-function fetchDataWithId(canton, use_week, id) {
-	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/vaccination_data/master/vaccination_data_" + canton.toLowerCase() + ".csv",
+function fetchData() {
+	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/vaccination_data/master/vaccination_data_total.csv",
 		function(data){
-			processData(data, canton, use_week, id)
+
+			processCanton('AG', false, data);
+			processCanton('AI', false, data);
+			processCanton('AR', false, data);
+			processCanton('BE', false, data);
+			processCanton('BL', false, data);
+			processCanton('BS', false, data);
+			processCanton('GE', true, data);
+			processCanton('GR', false, data);
+			processCanton('JU', true, data);
+			processCanton('NE', false, data);
+			processCanton('NW', false, data);
+			processCanton('SG', false, data);
+			processCanton('SH', false, data);
+			processCanton('SO', false, data);
+			processCanton('TG', false, data);
+			processCanton('VD', false, data);
+			processCanton('VS', false, data);
+			processCanton('ZG', false, data);
 		}
 	);
 };
 
-function processData(rows, canton, use_week, id) {
+function processCanton(canton, use_week, data) {
+	let canton_data = [];
+	for (let i = 0; i < data.length; ++i) {
+		row = data[i];
+		if (row['canton'] === canton) {
+			canton_data.push(row);
+		}
+	}
+	processData(canton_data, canton, use_week);
+}
+
+function processData(rows, canton, use_week) {
 	let dates = [];
 	let first_doses = [];
 	let second_doses = [];
@@ -130,36 +155,19 @@ function processData(rows, canton, use_week, id) {
 		text: doses_delivered,
 	},
 	];
-	initPlotly(canton, traces, id);
+	initPlotly(canton, traces);
 }
 
-function initPlotly(canton, traces, id){
+function initPlotly(canton, traces){
 	let layout = {
 		title: 'Vaccination data for ' + canton,
 		barmode: 'stack',
 	};
 
-	Plotly.newPlot('plot_' + id, traces, layout);
+	Plotly.newPlot('plot_' + canton, traces, layout);
 };
 
-fetchData('AG', false);
-fetchData('AI', false);
-fetchData('AR', false);
-fetchData('BE', false);
-fetchData('BL', false);
-fetchData('BS', false);
-fetchData('GE', true);
-fetchData('GR', false);
-fetchData('JU', true);
-fetchData('NE', false);
-fetchData('NW', false);
-fetchData('SG', false);
-fetchData('SH', false);
-fetchData('SO', false);
-fetchData('TG', false);
-fetchData('VD', false);
-fetchData('VS', false);
-fetchData('ZG', false);
+fetchData();
 
 </script>
 
