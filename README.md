@@ -37,3 +37,5 @@
 
 ## Vaccination data
 [Vaccination data per cantons](https://maekke.github.io/visualize_vaccinations.html)
+
+[Vaccination overview](https://maekke.github.io/visualize_vaccinations_overview.html)
