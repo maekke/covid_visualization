@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+
+<table id="overview">
+</table>
+
+<script>
+
+function getValue(value) {
+	if (value) {
+		return value;
+	}
+	return '-';
+}
+
+function getPercentValue(value, inhabitants) {
+	if (value) {
+		let result = value / inhabitants * 100;
+		return result.toFixed(2);
+	}
+	return '-';
+}
+
+function fetchData() {
+	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/vaccination_data/master/vaccination_data_total.csv",
+		function(data){
+			const cantons = getCantons();
+			const canton_inhabitants = getCantonInhabitants();
+			let cantons_data = [];
+			cantons_data.length = cantons.length;
+
+			// get the latest cantonal data entry
+			for (let r = 0; r < data.length; ++r) {
+				let row = data[r];
+				let index = cantons.indexOf(row['canton']);
+				cantons_data[index] = row;
+			}
+
+			let total_values = [0, 0, 0];
+			let total_inhabitants = [0, 0, 0];
+
+			let table = document.getElementById('overview');
+			{
+				let tr = table.insertRow();
+				let td = tr.insertCell();
+				td.appendChild(document.createTextNode('Canton'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('Date/Week'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('First doses'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('First doses per 100'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('Second doses'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('Second doses per 100'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('Total vaccinations'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('Total vaccinations per 100'));
+
+			}
+			for (let c = 0; c < cantons.length; ++c) {
+				let tr = table.insertRow();
+				let td = tr.insertCell();
+				td.appendChild(document.createTextNode(cantons[c]));
+				if (cantons_data[c]) {
+					const inhabitants = canton_inhabitants[cantons[c]];
+					const first_doses = cantons_data[c]['first_doses'];
+					const second_doses = cantons_data[c]['second_doses'];
+					const total_vaccinations = cantons_data[c]['total_vaccinations'];
+					let date_week = cantons_data[c]['date'];
+					if (date_week == '') {
+						date_week = 'W' + cantons_data[c]['week'] + ' ' + cantons_data[c]['year'];
+					}
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(date_week));
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(getValue(first_doses)));
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(getPercentValue(first_doses, inhabitants)));
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(getValue(second_doses)));
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(getPercentValue(second_doses, inhabitants)));
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(getValue(total_vaccinations)));
+					td = tr.insertCell();
+					td.appendChild(document.createTextNode(getPercentValue(total_vaccinations, inhabitants)));
+
+					if (first_doses !== '') {
+						total_values[0] += parseInt(first_doses);
+						total_inhabitants[0] += inhabitants;
+					}
+					if (second_doses !== '') {
+						total_values[1] += parseInt(second_doses);
+						total_inhabitants[1] += inhabitants;
+					}
+					if (total_vaccinations !== '') {
+						total_values[2] += parseInt(total_vaccinations);
+						total_inhabitants[2] += inhabitants;
+					}
+
+				}
+				else {
+					for (let i = 0; i < 7; ++i) {
+						td = tr.insertCell();
+						td.appendChild(document.createTextNode('-'));
+					}
+				}
+			}
+
+			{
+				let tr = table.insertRow();
+				let td = tr.insertCell();
+				td.appendChild(document.createTextNode('Total'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode('-'));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode(total_values[0]));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode(getPercentValue(total_values[0], total_inhabitants[0])));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode(total_values[1]));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode(getPercentValue(total_values[1], total_inhabitants[1])));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode(total_values[2]));
+				td = tr.insertCell();
+				td.appendChild(document.createTextNode(getPercentValue(total_values[2], total_inhabitants[2])));
+
+			}
+
+		}
+	);
+};
+
+fetchData();
+
+</script>
+
+</body>
+</html>
