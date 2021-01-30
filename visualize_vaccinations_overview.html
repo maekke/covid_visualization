@@ -4,10 +4,46 @@
 <head>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="openzh_covid19.js"></script>
+<style>
+
+table {
+	width: 100%;
+	border-spacing: 0px 0px;
+}
+
+tr:nth-child(even) {
+	background-color: lightgray;
+}
+
+tr:last-child {
+	background-color: gray;
+	font-weight: bold;
+}
+
+td {
+	padding: 0.2em;
+}
+
+th {
+	text-align: left;
+	background-color: gray;
+}
+
+</style>
 </head>
 <body>
 
 <table id="overview">
+	<thead>
+		<th>Canton</th>
+		<th>Date/Week</th>
+		<th>First doses</th>
+		<th>First doses per 100</th>
+		<th>Second doses</th>
+		<th>Second doses per 100</th>
+		<th>Total vaccinations</th>
+		<th>Total vaccinations per 100</th>
+	</thead>
 </table>
 
 <script>
@@ -46,26 +82,6 @@ function fetchData() {
 			let total_inhabitants = [0, 0, 0];
 
 			let table = document.getElementById('overview');
-			{
-				let tr = table.insertRow();
-				let td = tr.insertCell();
-				td.appendChild(document.createTextNode('Canton'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('Date/Week'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('First doses'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('First doses per 100'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('Second doses'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('Second doses per 100'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('Total vaccinations'));
-				td = tr.insertCell();
-				td.appendChild(document.createTextNode('Total vaccinations per 100'));
-
-			}
 			for (let c = 0; c < cantons.length; ++c) {
 				let tr = table.insertRow();
 				let td = tr.insertCell();
