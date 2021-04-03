@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="openzh_covid19.js"></script>
+</head>
+<body>
+<div id="plot" style="width:100%; height:600px;"></div>
+
+<script>
+
+function fetchData() {
+	Plotly.d3.csv("https://raw.githubusercontent.com/maekke/vaccination_data/master/vaccination_data_total.csv",
+		function(data){
+
+			processData(data);
+		}
+	);
+};
+
+function processData(rows) {
+	let dates = [];
+	let total_vaccinations = [];
+	const cantons = getCantons();
+
+	for (let i = 0; i < rows.length; ++i) {
+		let row = rows[i];
+		if (row['date'] === '') {
+			continue;
+		}
+		let index = dates.indexOf(row['date']);
+		if (index === -1) {
+			index = dates.length;
+			dates.push(row['date']);
+			total_vaccinations.push([]);
+			for (let c = 0; c < cantons.length; ++c) {
+				total_vaccinations[index].push(0);
+			}
+		}
+
+		let c_index = cantons.indexOf(row['canton'])
+		total_vaccinations[index][c_index] += parseInt(row['total_vaccinations']);
+	}
+
+	total_vaccinations = fillUnavailableValues(total_vaccinations);
+	let data_sum = sumCantonalData(total_vaccinations);
+	let total_vaccinations_diff = diffData(data_sum);
+
+	traces = [{
+		x: dates,
+		y: total_vaccinations_diff,
+		name: 'Daily vaccinations',
+		type: 'bar',
+		visible: true,
+		text: total_vaccinations,
+	},
+	{
+		x: dates,
+		y: data_sum,
+		name: 'Total vaccinations',
+		type: 'bar',
+		visible: 'legendonly',
+		text: total_vaccinations,
+	},
+
+	];
+	initPlotly(traces);
+}
+
+function initPlotly(traces){
+	let layout = {
+		title: 'Vaccination data for CH/FL'
+	};
+
+	Plotly.newPlot('plot', traces, layout);
+};
+
+fetchData();
+
+</script>
+
+<p>
+<a href="https://github.com/maekke/vaccination_data">vaccination data repository @ github</a>
+</p>
+
+</body>
+</html>

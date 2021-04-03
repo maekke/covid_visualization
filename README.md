@@ -39,3 +39,5 @@
 [Vaccination data per cantons](https://maekke.github.io/visualize_vaccinations.html)
 
 [Vaccination overview](https://maekke.github.io/visualize_vaccinations_overview.html)
+
+[Vaccination overview for CH/FL](https://maekke.github.io/visualize_vaccinations_overall.html)
