@@ -92,7 +92,7 @@ function processData(rows, canton, use_week) {
 
 	let has_first_doses = true;
 	let has_second_doses = true;
-	let has_total_vaccinations = true;
+	let has_total_vaccinations = false;
 	let has_doses_delivered = false;
 
 	for (let i = 0; i < rows.length; ++i) {
@@ -120,7 +120,12 @@ function processData(rows, canton, use_week) {
 		}
 		first_doses.push(row['first_doses']);
 		second_doses.push(row['second_doses']);
-		total_vaccinations.push(row['total_vaccinations']);
+		if (row['total_vaccinations'] !== '') {
+			total_vaccinations.push(row['total_vaccinations']);
+		}
+		else {
+			total_vaccinations.push(NaN);
+		}
 		if (row['doses_delivered'] !== '') {
 			last_doses_delivered = row['doses_delivered'];
 		}
@@ -128,7 +133,7 @@ function processData(rows, canton, use_week) {
 
 		has_first_doses &= row['first_doses'] !== '';
 		has_second_doses &= row['second_doses'] !== '';
-		has_total_vaccinations &= row['total_vaccinations'] !== '';
+		has_total_vaccinations |= row['total_vaccinations'] !== '';
 		has_doses_delivered |= row['doses_delivered'] !== '';
 	}
 
