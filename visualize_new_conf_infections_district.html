@@ -17,15 +17,15 @@
 
 <script>
 
-function fetchData(url, canton, useDate) {
+function fetchData(url, canton, useDate, computeWeeklyData) {
  	Plotly.d3.csv(url,
 		function(data){
-			processData(data, canton, useDate);
+			processData(data, canton, useDate, computeWeeklyData);
 		}
 	);
 };
 	
-function processData(rows, canton, useDate) {
+function processData(rows, canton, useDate, computeWeeklyData) {
 	let weeks = [];
 	let districts = [];
 
@@ -91,7 +91,7 @@ function processData(rows, canton, useDate) {
 		}
 	}
 
-	if (useDate) {
+	if (computeWeeklyData) {
 		for (let i = 0; i < weeks.length; ++i) {
 			for (let district = 0; district < districts.length; ++district) {
 				let sum = 0;
@@ -142,15 +142,15 @@ function updatePlot(weeks, districts, new_conf_cases_per100k, canton, new_conf_c
 	Plotly.newPlot(canton, data, layout);
 };
 
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BE_bezirk.csv', 'BE', false);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BL_bezirk.csv', 'BL', true);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv', 'FR', true);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv', 'GR', true);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv', 'SG', true);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv', 'SO', true);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_TG_bezirk.csv', 'TG', false);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_VS_bezirk.csv', 'VS', false);
-fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv', 'ZH', false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BE_bezirk.csv', 'BE', false, false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_BL_bezirk.csv', 'BL', true, false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_FR_bezirk.csv', 'FR', true, true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_GR_bezirk.csv', 'GR', true, true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SG_bezirk.csv', 'SG', true, true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_SO_bezirk.csv', 'SO', true, true);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_TG_bezirk.csv', 'TG', false, false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_VS_bezirk.csv', 'VS', false, false);
+fetchData('https://raw.githubusercontent.com/openZH/covid_19/master/fallzahlen_bezirke/fallzahlen_kanton_ZH_bezirk.csv', 'ZH', false, false);
 
 </script>
 
