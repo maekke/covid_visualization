@@ -90,9 +90,12 @@ function processData(rows, canton, use_week) {
 	let doses_delivered = [];
 	let last_doses_delivered = '';
 
-	let has_first_doses = true;
-	let has_second_doses = true;
-	let has_total_vaccinations = false;
+	// let has_first_doses = true;
+	// let has_second_doses = true;
+	// let has_total_vaccinations = false;
+	let has_first_doses = false;
+	let has_second_doses = false;
+	let has_total_vaccinations = true;
 	let has_doses_delivered = false;
 
 	for (let i = 0; i < rows.length; ++i) {
